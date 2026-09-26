@@ -1,4 +1,4 @@
-const CACHE_NAME = "lflc-church-attendance-v1";
+const CACHE_NAME = "lflc-church-attendance-v2";
 
 const APP_FILES = [
   "./",

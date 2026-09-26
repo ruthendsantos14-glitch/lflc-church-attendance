@@ -24,7 +24,6 @@
   <title>LFNC Church Check-In</title>
 
   <style>
-
     * {
       box-sizing: border-box;
     }
@@ -227,10 +226,9 @@
     }
 
     /*
-     * IMPORTANT:
-     * These iframes are visually hidden but NOT display:none.
-     * Android Chrome can be unreliable with POST targets
-     * when the target iframe is display:none.
+     * Important:
+     * These iframes are hidden visually but are NOT display:none.
+     * This improves reliability with Android Chrome POST requests.
      */
     .api-frame {
       position: fixed;
@@ -242,11 +240,8 @@
       left: -10px;
       top: -10px;
     }
-
   </style>
-
 </head>
-
 
 <body>
 
@@ -290,7 +285,6 @@
         Register & Check In
       </h2>
 
-
       <label for="name">
         Name
       </label>
@@ -301,7 +295,6 @@
         placeholder="Enter your name"
         autocomplete="name"
       >
-
 
       <label for="mobile">
         Mobile Number
@@ -314,7 +307,6 @@
         autocomplete="tel"
       >
 
-
       <label for="location">
         Location
       </label>
@@ -326,14 +318,12 @@
         autocomplete="address-level2"
       >
 
-
       <button
         id="registerButton"
         type="button"
       >
         REGISTER & CHECK IN
       </button>
-
 
       <div
         id="registrationMessage"
@@ -354,12 +344,10 @@
         Welcome
       </h2>
 
-
       <div
         class="member-info"
         id="memberInfo"
       ></div>
-
 
       <button
         id="checkInButton"
@@ -368,7 +356,6 @@
         CHECK IN
       </button>
 
-
       <button
         id="forgetButton"
         class="secondary"
@@ -376,7 +363,6 @@
       >
         THIS IS NOT ME
       </button>
-
 
       <div
         id="checkInMessage"
@@ -391,9 +377,6 @@
     </div>
 
   </div>
-
-
-  <!-- API IFRAMES ARE CREATED DYNAMICALLY -->
 
 
   <!-- LOADING -->
@@ -425,7 +408,6 @@
     const APPS_SCRIPT_URL =
       "https://script.google.com/macros/s/AKfycbwRQpqB5xLZJ5XD2qd3wOHeoA6W8b9KebrFaNb1HSQ9GkwsXicepPDYSsNjP66yfN9S1w/exec";
 
-
     const MEMBER_KEY =
       "churchMemberId";
 
@@ -435,29 +417,19 @@
      ************************************************/
 
     const registrationCard =
-      document.getElementById(
-        "registrationCard"
-      );
+      document.getElementById("registrationCard");
 
     const memberCard =
-      document.getElementById(
-        "memberCard"
-      );
+      document.getElementById("memberCard");
 
     const registerButton =
-      document.getElementById(
-        "registerButton"
-      );
+      document.getElementById("registerButton");
 
     const checkInButton =
-      document.getElementById(
-        "checkInButton"
-      );
+      document.getElementById("checkInButton");
 
     const forgetButton =
-      document.getElementById(
-        "forgetButton"
-      );
+      document.getElementById("forgetButton");
 
 
     /************************************************
@@ -467,29 +439,21 @@
     registerButton.addEventListener(
       "click",
       function () {
-
         registerMember();
-
       }
     );
-
 
     checkInButton.addEventListener(
       "click",
       function () {
-
         checkIn();
-
       }
     );
-
 
     forgetButton.addEventListener(
       "click",
       function () {
-
         forgetMember();
-
       }
     );
 
@@ -497,33 +461,22 @@
     /************************************************
      * API POST
      *
-     * Each request gets its OWN iframe.
-     * This prevents requests from overwriting
-     * each other's callbacks.
+     * Every request gets its own iframe.
      ************************************************/
 
-    function apiPost(
-      action,
-      data
-    ) {
+    function apiPost(action, data) {
 
       return new Promise(
         function (resolve, reject) {
 
-          var frameName =
+          const frameName =
             "apiFrame_" +
             Date.now() +
             "_" +
-            Math.floor(
-              Math.random() * 100000
-            );
+            Math.floor(Math.random() * 100000);
 
-
-          var iframe =
-            document.createElement(
-              "iframe"
-            );
-
+          const iframe =
+            document.createElement("iframe");
 
           iframe.name =
             frameName;
@@ -531,17 +484,13 @@
           iframe.className =
             "api-frame";
 
-
           document.body.appendChild(
             iframe
           );
 
 
-          var form =
-            document.createElement(
-              "form"
-            );
-
+          const form =
+            document.createElement("form");
 
           form.method =
             "POST";
@@ -556,40 +505,15 @@
             "none";
 
 
-          var payload =
-            document.createElement(
-              "input"
-            );
-
-
-          payload.type =
-            "hidden";
-
-          payload.name =
-            "payload";
-
-          payload.value =
-            JSON.stringify({
-
-              action:
-                action,
-
-              data:
-                data || {}
-
-            });
-
-
           /*
-           * The Apps Script backend currently
-           * reads the action/data from the root
-           * payload object.
-           *
-           * Therefore create the payload in
-           * the exact format expected by doPost().
+           * IMPORTANT:
+           * The Apps Script backend expects
+           * action, name, mobile, location,
+           * latitude, longitude, accuracy and
+           * memberId directly in the payload.
            */
 
-          var requestPayload = {
+          const requestPayload = {
 
             action:
               action,
@@ -632,23 +556,28 @@
           };
 
 
-          payload.value =
-            JSON.stringify(
-              requestPayload
-            );
+          const payload =
+            document.createElement("input");
 
+          payload.type =
+            "hidden";
+
+          payload.name =
+            "payload";
+
+          payload.value =
+            JSON.stringify(requestPayload);
 
           form.appendChild(
             payload
           );
-
 
           document.body.appendChild(
             form
           );
 
 
-          var completed =
+          let completed =
             false;
 
 
@@ -722,14 +651,7 @@
           }
 
 
-          /*
-           * Each request gets a unique message
-           * listener.
-           */
-
-          function messageHandler(
-            event
-          ) {
+          function messageHandler(event) {
 
             if (
               !event.data ||
@@ -814,21 +736,16 @@
      * LOADING
      ************************************************/
 
-    function showLoading(
-      message
-    ) {
+    function showLoading(message) {
 
       document.getElementById(
         "loadingText"
       ).textContent =
         message;
 
-
       document.getElementById(
         "loadingOverlay"
-      ).classList.add(
-        "show"
-      );
+      ).classList.add("show");
 
     }
 
@@ -837,9 +754,7 @@
 
       document.getElementById(
         "loadingOverlay"
-      ).classList.remove(
-        "show"
-      );
+      ).classList.remove("show");
 
     }
 
@@ -854,15 +769,13 @@
       success
     ) {
 
-      var element =
+      const element =
         document.getElementById(
           elementId
         );
 
-
       element.textContent =
         message || "";
-
 
       element.className =
         "message show " +
@@ -884,9 +797,7 @@
       return new Promise(
         function (resolve) {
 
-          if (
-            !navigator.geolocation
-          ) {
+          if (!navigator.geolocation) {
 
             resolve({
 
@@ -902,18 +813,15 @@
           }
 
 
-          var finished =
+          let finished =
             false;
 
 
-          function finish(
-            result
-          ) {
+          function finish(result) {
 
             if (finished) {
               return;
             }
-
 
             finished = true;
 
@@ -922,11 +830,7 @@
           }
 
 
-          /*
-           * Safety timer.
-           */
-
-          var safetyTimer =
+          const safetyTimer =
             setTimeout(
               function () {
 
@@ -978,33 +882,25 @@
               );
 
 
-              var message =
+              let message =
                 "Unable to get your location.";
 
 
-              if (
-                error.code === 1
-              ) {
+              if (error.code === 1) {
 
                 message =
                   "Location permission was denied. Please allow location access and try again.";
 
               }
 
-
-              else if (
-                error.code === 2
-              ) {
+              else if (error.code === 2) {
 
                 message =
                   "Your location could not be determined. Please try again.";
 
               }
 
-
-              else if (
-                error.code === 3
-              ) {
+              else if (error.code === 3) {
 
                 message =
                   "Location request timed out. Please try again.";
@@ -1051,25 +947,23 @@
 
     async function registerMember() {
 
-      var name =
+      const name =
         document.getElementById(
           "name"
         ).value.trim();
 
 
-      var mobile =
+      const mobile =
         document.getElementById(
           "mobile"
         ).value.trim();
 
 
-      var location =
+      const location =
         document.getElementById(
           "location"
         ).value.trim();
 
-
-      /******** VALIDATION ********/
 
       if (!name) {
 
@@ -1110,8 +1004,6 @@
       }
 
 
-      /******** DISABLE ********/
-
       registerButton.disabled =
         true;
 
@@ -1123,9 +1015,7 @@
 
       try {
 
-        /******** GPS ********/
-
-        var gps =
+        const gps =
           await getLocation();
 
 
@@ -1147,14 +1037,12 @@
         }
 
 
-        /******** SERVER ********/
-
         showLoading(
           "Registering and checking you in..."
         );
 
 
-        var result =
+        const result =
           await apiPost(
 
             "registerAndCheckIn",
@@ -1187,8 +1075,6 @@
         hideLoading();
 
 
-        /******** RESULT ********/
-
         if (
           !result ||
           !result.success
@@ -1218,8 +1104,6 @@
 
         }
 
-
-        /******** SAVE MEMBER ********/
 
         if (
           result.member &&
@@ -1289,7 +1173,7 @@
 
     async function checkIn() {
 
-      var memberId =
+      const memberId =
         localStorage.getItem(
           MEMBER_KEY
         );
@@ -1315,9 +1199,7 @@
 
       try {
 
-        /******** GPS ********/
-
-        var gps =
+        const gps =
           await getLocation();
 
 
@@ -1345,14 +1227,12 @@
         }
 
 
-        /******** CHECK IN ********/
-
         showLoading(
           "Checking you in..."
         );
 
 
-        var result =
+        const result =
           await apiPost(
 
             "checkInMember",
@@ -1378,8 +1258,6 @@
 
         hideLoading();
 
-
-        /******** RESULT ********/
 
         if (
           !result ||
@@ -1456,9 +1334,7 @@
      * SHOW MEMBER
      ************************************************/
 
-    function showMember(
-      member
-    ) {
+    function showMember(member) {
 
       registrationCard.style.display =
         "none";
@@ -1511,7 +1387,7 @@
 
     async function loadSavedMember() {
 
-      var memberId =
+      const memberId =
         localStorage.getItem(
           MEMBER_KEY
         );
@@ -1524,7 +1400,7 @@
 
       try {
 
-        var member =
+        const member =
           await apiPost(
 
             "getMember",
@@ -1559,9 +1435,9 @@
       } catch (error) {
 
         /*
-         * If the server is temporarily
-         * unavailable, don't delete the
-         * saved member ID.
+         * Do not delete the saved member
+         * just because the server is temporarily
+         * unavailable.
          */
 
         console.log(
@@ -1626,9 +1502,7 @@
      * HTML ESCAPE
      ************************************************/
 
-    function escapeHtml(
-      text
-    ) {
+    function escapeHtml(text) {
 
       return String(text)
 
@@ -1664,9 +1538,7 @@
      * SERVICE WORKER
      ************************************************/
 
-    if (
-      "serviceWorker" in navigator
-    ) {
+    if ("serviceWorker" in navigator) {
 
       window.addEventListener(
         "load",

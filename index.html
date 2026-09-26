@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
 
@@ -23,6 +24,7 @@
   <title>LFNC Church Check-In</title>
 
   <style>
+
     * {
       box-sizing: border-box;
     }
@@ -38,9 +40,9 @@
     }
 
     body {
+      min-height: 100vh;
       display: flex;
       justify-content: center;
-      min-height: 100vh;
     }
 
     .app {
@@ -83,7 +85,7 @@
     }
 
     .card {
-      background: #fff;
+      background: #ffffff;
       border: 1px solid #e1e5eb;
       border-radius: 16px;
       padding: 20px;
@@ -110,7 +112,7 @@
       border-radius: 10px;
       font-size: 16px;
       outline: none;
-      background: #fff;
+      background: #ffffff;
     }
 
     input:focus {
@@ -126,8 +128,9 @@
       font-weight: bold;
       cursor: pointer;
       margin-top: 18px;
-      background: #111;
-      color: #fff;
+      background: #111111;
+      color: #ffffff;
+      -webkit-tap-highlight-color: transparent;
     }
 
     button:disabled {
@@ -137,7 +140,7 @@
 
     .secondary {
       background: #eeeeee;
-      color: #222;
+      color: #222222;
     }
 
     .message {
@@ -147,6 +150,7 @@
       font-size: 14px;
       line-height: 1.5;
       display: none;
+      word-break: break-word;
     }
 
     .message.show {
@@ -178,7 +182,7 @@
 
     .footer {
       text-align: center;
-      color: #777;
+      color: #777777;
       font-size: 12px;
       margin-top: 28px;
       line-height: 1.5;
@@ -187,7 +191,7 @@
     .loading-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.94);
       display: none;
       align-items: center;
       justify-content: center;
@@ -209,8 +213,8 @@
     .spinner {
       width: 42px;
       height: 42px;
-      border: 4px solid #ddd;
-      border-top-color: #111;
+      border: 4px solid #dddddd;
+      border-top-color: #111111;
       border-radius: 50%;
       margin: 0 auto 16px;
       animation: spin 0.8s linear infinite;
@@ -222,11 +226,27 @@
       }
     }
 
-    .hidden-form {
-      display: none;
+    /*
+     * IMPORTANT:
+     * These iframes are visually hidden but NOT display:none.
+     * Android Chrome can be unreliable with POST targets
+     * when the target iframe is display:none.
+     */
+    .api-frame {
+      position: fixed;
+      width: 1px;
+      height: 1px;
+      border: 0;
+      opacity: 0;
+      pointer-events: none;
+      left: -10px;
+      top: -10px;
     }
+
   </style>
+
 </head>
+
 
 <body>
 
@@ -266,7 +286,10 @@
       id="registrationCard"
     >
 
-      <h2>Register & Check In</h2>
+      <h2>
+        Register & Check In
+      </h2>
+
 
       <label for="name">
         Name
@@ -279,6 +302,7 @@
         autocomplete="name"
       >
 
+
       <label for="mobile">
         Mobile Number
       </label>
@@ -289,6 +313,7 @@
         placeholder="Enter your mobile number"
         autocomplete="tel"
       >
+
 
       <label for="location">
         Location
@@ -301,13 +326,14 @@
         autocomplete="address-level2"
       >
 
+
       <button
         id="registerButton"
         type="button"
-        onclick="registerMember()"
       >
         REGISTER & CHECK IN
       </button>
+
 
       <div
         id="registrationMessage"
@@ -324,28 +350,33 @@
       id="memberCard"
     >
 
-      <h2>Welcome</h2>
+      <h2>
+        Welcome
+      </h2>
+
 
       <div
         class="member-info"
         id="memberInfo"
       ></div>
 
+
       <button
         id="checkInButton"
         type="button"
-        onclick="checkIn()"
       >
         CHECK IN
       </button>
 
+
       <button
+        id="forgetButton"
         class="secondary"
         type="button"
-        onclick="forgetMember()"
       >
         THIS IS NOT ME
       </button>
+
 
       <div
         id="checkInMessage"
@@ -362,16 +393,10 @@
   </div>
 
 
-  <!-- Hidden Apps Script API iframe -->
-
-  <iframe
-    name="apiFrame"
-    id="apiFrame"
-    class="hidden-form"
-  ></iframe>
+  <!-- API IFRAMES ARE CREATED DYNAMICALLY -->
 
 
-  <!-- Loading screen -->
+  <!-- LOADING -->
 
   <div
     class="loading-overlay"
@@ -393,6 +418,10 @@
 
   <script>
 
+    /************************************************
+     * CONFIGURATION
+     ************************************************/
+
     const APPS_SCRIPT_URL =
       "https://script.google.com/macros/s/AKfycbwRQpqB5xLZJ5XD2qd3wOHeoA6W8b9KebrFaNb1HSQ9GkwsXicepPDYSsNjP66yfN9S1w/exec";
 
@@ -401,107 +430,405 @@
       "churchMemberId";
 
 
-    let pendingRequest = null;
+    /************************************************
+     * DOM
+     ************************************************/
+
+    const registrationCard =
+      document.getElementById(
+        "registrationCard"
+      );
+
+    const memberCard =
+      document.getElementById(
+        "memberCard"
+      );
+
+    const registerButton =
+      document.getElementById(
+        "registerButton"
+      );
+
+    const checkInButton =
+      document.getElementById(
+        "checkInButton"
+      );
+
+    const forgetButton =
+      document.getElementById(
+        "forgetButton"
+      );
 
 
-    /*
-     * Receive responses from Google Apps Script
-     */
+    /************************************************
+     * BUTTON EVENTS
+     ************************************************/
 
-    window.addEventListener(
-      "message",
-      function(event) {
+    registerButton.addEventListener(
+      "click",
+      function () {
 
-        if (
-          !event.data ||
-          event.data.type !== "LFNC_ATTENDANCE_RESULT"
-        ) {
-          return;
-        }
-
-        const result =
-          event.data.result;
-
-        if (pendingRequest) {
-
-          const callback =
-            pendingRequest;
-
-          pendingRequest = null;
-
-          callback(result);
-
-        }
+        registerMember();
 
       }
     );
 
 
-    /*
-     * Send request to Apps Script
-     */
+    checkInButton.addEventListener(
+      "click",
+      function () {
 
-    function apiPost(action, data, callback) {
+        checkIn();
 
-      pendingRequest = callback;
+      }
+    );
 
-      const form =
-        document.createElement("form");
 
-      form.method = "POST";
+    forgetButton.addEventListener(
+      "click",
+      function () {
 
-      form.action =
-        APPS_SCRIPT_URL;
+        forgetMember();
 
-      form.target =
-        "apiFrame";
+      }
+    );
 
-      const payload =
-        document.createElement("input");
 
-      payload.type =
-        "hidden";
+    /************************************************
+     * API POST
+     *
+     * Each request gets its OWN iframe.
+     * This prevents requests from overwriting
+     * each other's callbacks.
+     ************************************************/
 
-      payload.name =
-        "payload";
+    function apiPost(
+      action,
+      data
+    ) {
 
-      payload.value =
-        JSON.stringify({
-          action: action,
-          data: data || {}
-        });
+      return new Promise(
+        function (resolve, reject) {
 
-      form.appendChild(payload);
+          var frameName =
+            "apiFrame_" +
+            Date.now() +
+            "_" +
+            Math.floor(
+              Math.random() * 100000
+            );
 
-      document.body.appendChild(form);
 
-      form.submit();
+          var iframe =
+            document.createElement(
+              "iframe"
+            );
 
-      setTimeout(function() {
 
-        if (form.parentNode) {
-          form.parentNode.removeChild(form);
+          iframe.name =
+            frameName;
+
+          iframe.className =
+            "api-frame";
+
+
+          document.body.appendChild(
+            iframe
+          );
+
+
+          var form =
+            document.createElement(
+              "form"
+            );
+
+
+          form.method =
+            "POST";
+
+          form.action =
+            APPS_SCRIPT_URL;
+
+          form.target =
+            frameName;
+
+          form.style.display =
+            "none";
+
+
+          var payload =
+            document.createElement(
+              "input"
+            );
+
+
+          payload.type =
+            "hidden";
+
+          payload.name =
+            "payload";
+
+          payload.value =
+            JSON.stringify({
+
+              action:
+                action,
+
+              data:
+                data || {}
+
+            });
+
+
+          /*
+           * The Apps Script backend currently
+           * reads the action/data from the root
+           * payload object.
+           *
+           * Therefore create the payload in
+           * the exact format expected by doPost().
+           */
+
+          var requestPayload = {
+
+            action:
+              action,
+
+            name:
+              data && data.name
+                ? data.name
+                : undefined,
+
+            mobile:
+              data && data.mobile
+                ? data.mobile
+                : undefined,
+
+            location:
+              data && data.location
+                ? data.location
+                : undefined,
+
+            latitude:
+              data && data.latitude !== undefined
+                ? data.latitude
+                : undefined,
+
+            longitude:
+              data && data.longitude !== undefined
+                ? data.longitude
+                : undefined,
+
+            accuracy:
+              data && data.accuracy !== undefined
+                ? data.accuracy
+                : undefined,
+
+            memberId:
+              data && data.memberId
+                ? data.memberId
+                : undefined
+
+          };
+
+
+          payload.value =
+            JSON.stringify(
+              requestPayload
+            );
+
+
+          form.appendChild(
+            payload
+          );
+
+
+          document.body.appendChild(
+            form
+          );
+
+
+          var completed =
+            false;
+
+
+          function cleanup() {
+
+            try {
+
+              if (
+                form &&
+                form.parentNode
+              ) {
+
+                form.parentNode.removeChild(
+                  form
+                );
+
+              }
+
+              if (
+                iframe &&
+                iframe.parentNode
+              ) {
+
+                iframe.parentNode.removeChild(
+                  iframe
+                );
+
+              }
+
+            } catch (error) {
+
+              console.log(
+                "Cleanup error:",
+                error
+              );
+
+            }
+
+          }
+
+
+          function success(result) {
+
+            if (completed) {
+              return;
+            }
+
+            completed = true;
+
+            cleanup();
+
+            resolve(result);
+
+          }
+
+
+          function failure(message) {
+
+            if (completed) {
+              return;
+            }
+
+            completed = true;
+
+            cleanup();
+
+            reject(
+              new Error(message)
+            );
+
+          }
+
+
+          /*
+           * Each request gets a unique message
+           * listener.
+           */
+
+          function messageHandler(
+            event
+          ) {
+
+            if (
+              !event.data ||
+              event.data.type !==
+                "LFNC_ATTENDANCE_RESULT"
+            ) {
+
+              return;
+
+            }
+
+
+            window.removeEventListener(
+              "message",
+              messageHandler
+            );
+
+
+            success(
+              event.data.result
+            );
+
+          }
+
+
+          window.addEventListener(
+            "message",
+            messageHandler
+          );
+
+
+          /*
+           * Safety timeout.
+           */
+
+          setTimeout(
+            function () {
+
+              window.removeEventListener(
+                "message",
+                messageHandler
+              );
+
+
+              if (!completed) {
+
+                failure(
+                  "The server did not respond. Please check your internet connection and try again."
+                );
+
+              }
+
+            },
+            30000
+          );
+
+
+          try {
+
+            form.submit();
+
+          } catch (error) {
+
+            window.removeEventListener(
+              "message",
+              messageHandler
+            );
+
+            failure(
+              error.message
+            );
+
+          }
+
         }
-
-      }, 1000);
+      );
 
     }
 
 
-    /*
-     * Loading screen
-     */
+    /************************************************
+     * LOADING
+     ************************************************/
 
-    function showLoading(message) {
+    function showLoading(
+      message
+    ) {
 
       document.getElementById(
         "loadingText"
       ).textContent =
         message;
 
+
       document.getElementById(
         "loadingOverlay"
-      ).classList.add("show");
+      ).classList.add(
+        "show"
+      );
 
     }
 
@@ -510,14 +837,16 @@
 
       document.getElementById(
         "loadingOverlay"
-      ).classList.remove("show");
+      ).classList.remove(
+        "show"
+      );
 
     }
 
 
-    /*
-     * Message helper
-     */
+    /************************************************
+     * MESSAGES
+     ************************************************/
 
     function showMessage(
       elementId,
@@ -525,160 +854,222 @@
       success
     ) {
 
-      const element =
-        document.getElementById(elementId);
+      var element =
+        document.getElementById(
+          elementId
+        );
+
 
       element.textContent =
-        message;
+        message || "";
+
 
       element.className =
         "message show " +
-        (success ? "success" : "error");
+        (
+          success
+            ? "success"
+            : "error"
+        );
 
     }
 
 
-    /*
-     * Get fresh GPS location
-     */
+    /************************************************
+     * GPS
+     ************************************************/
 
-    function getLocation(callback) {
+    function getLocation() {
 
-      if (!navigator.geolocation) {
+      return new Promise(
+        function (resolve) {
 
-        callback({
-          success: false,
-          message:
-            "GPS is not supported on this device."
-        });
+          if (
+            !navigator.geolocation
+          ) {
 
-        return;
-      }
+            resolve({
 
+              success: false,
 
-      let finished =
-        false;
+              message:
+                "GPS is not supported on this device."
 
+            });
 
-      const finish =
-        function(result) {
-
-          if (finished) {
             return;
-          }
-
-          finished = true;
-
-          callback(result);
-
-        };
-
-
-      const safetyTimer =
-        setTimeout(function() {
-
-          finish({
-            success: false,
-            message:
-              "Location request timed out. Please make sure Location is ON and try again."
-          });
-
-        }, 35000);
-
-
-      navigator.geolocation.getCurrentPosition(
-
-        function(position) {
-
-          clearTimeout(
-            safetyTimer
-          );
-
-          finish({
-
-            success: true,
-
-            latitude:
-              position.coords.latitude,
-
-            longitude:
-              position.coords.longitude,
-
-            accuracy:
-              position.coords.accuracy
-
-          });
-
-        },
-
-        function(error) {
-
-          clearTimeout(
-            safetyTimer
-          );
-
-          let message =
-            "Unable to get your location.";
-
-          if (error.code === 1) {
-
-            message =
-              "Location permission was denied. Please allow location access and try again.";
-
-          } else if (error.code === 2) {
-
-            message =
-              "Your location could not be determined. Please try again.";
-
-          } else if (error.code === 3) {
-
-            message =
-              "Location request timed out. Please try again.";
 
           }
 
-          finish({
 
-            success: false,
+          var finished =
+            false;
 
-            message: message
 
-          });
+          function finish(
+            result
+          ) {
 
-        },
+            if (finished) {
+              return;
+            }
 
-        {
-          enableHighAccuracy: true,
-          timeout: 30000,
-          maximumAge: 0
+
+            finished = true;
+
+            resolve(result);
+
+          }
+
+
+          /*
+           * Safety timer.
+           */
+
+          var safetyTimer =
+            setTimeout(
+              function () {
+
+                finish({
+
+                  success: false,
+
+                  message:
+                    "Location request timed out. Please make sure Location is ON and try again."
+
+                });
+
+              },
+              35000
+            );
+
+
+          navigator.geolocation.getCurrentPosition(
+
+            function (position) {
+
+              clearTimeout(
+                safetyTimer
+              );
+
+
+              finish({
+
+                success: true,
+
+                latitude:
+                  position.coords.latitude,
+
+                longitude:
+                  position.coords.longitude,
+
+                accuracy:
+                  position.coords.accuracy
+
+              });
+
+            },
+
+
+            function (error) {
+
+              clearTimeout(
+                safetyTimer
+              );
+
+
+              var message =
+                "Unable to get your location.";
+
+
+              if (
+                error.code === 1
+              ) {
+
+                message =
+                  "Location permission was denied. Please allow location access and try again.";
+
+              }
+
+
+              else if (
+                error.code === 2
+              ) {
+
+                message =
+                  "Your location could not be determined. Please try again.";
+
+              }
+
+
+              else if (
+                error.code === 3
+              ) {
+
+                message =
+                  "Location request timed out. Please try again.";
+
+              }
+
+
+              finish({
+
+                success: false,
+
+                message:
+                  message
+
+              });
+
+            },
+
+
+            {
+
+              enableHighAccuracy:
+                true,
+
+              timeout:
+                30000,
+
+              maximumAge:
+                0
+
+            }
+
+          );
+
         }
-
       );
 
     }
 
 
-    /*
-     * Register new member and automatically check in
-     */
+    /************************************************
+     * REGISTER MEMBER
+     ************************************************/
 
-    function registerMember() {
+    async function registerMember() {
 
-      const name =
+      var name =
         document.getElementById(
           "name"
         ).value.trim();
 
-      const mobile =
+
+      var mobile =
         document.getElementById(
           "mobile"
         ).value.trim();
 
-      const location =
+
+      var location =
         document.getElementById(
           "location"
         ).value.trim();
 
+
+      /******** VALIDATION ********/
 
       if (!name) {
 
@@ -689,6 +1080,7 @@
         );
 
         return;
+
       }
 
 
@@ -701,6 +1093,7 @@
         );
 
         return;
+
       }
 
 
@@ -713,23 +1106,14 @@
         );
 
         return;
+
       }
 
 
-      const button =
-        document.getElementById(
-          "registerButton"
-        );
+      /******** DISABLE ********/
 
-      button.disabled =
+      registerButton.disabled =
         true;
-
-
-      showMessage(
-        "registrationMessage",
-        "",
-        true
-      );
 
 
       showLoading(
@@ -737,104 +1121,175 @@
       );
 
 
-      getLocation(
-        function(gps) {
+      try {
 
-          if (!gps.success) {
+        /******** GPS ********/
 
-            hideLoading();
-
-            button.disabled =
-              false;
-
-            showMessage(
-              "registrationMessage",
-              gps.message,
-              false
-            );
-
-            return;
-          }
+        var gps =
+          await getLocation();
 
 
-          showLoading(
-            "Registering and checking you in..."
+        if (!gps.success) {
+
+          hideLoading();
+
+          showMessage(
+            "registrationMessage",
+            gps.message,
+            false
           );
 
+          registerButton.disabled =
+            false;
 
-          apiPost(
+          return;
+
+        }
+
+
+        /******** SERVER ********/
+
+        showLoading(
+          "Registering and checking you in..."
+        );
+
+
+        var result =
+          await apiPost(
+
             "registerAndCheckIn",
 
             {
-              name: name,
-              mobile: mobile,
-              location: location,
-              latitude: gps.latitude,
-              longitude: gps.longitude,
-              accuracy: gps.accuracy
-            },
 
-            function(result) {
+              name:
+                name,
 
-              hideLoading();
+              mobile:
+                mobile,
 
-              button.disabled =
-                false;
+              location:
+                location,
 
+              latitude:
+                gps.latitude,
 
-              if (!result || !result.success) {
+              longitude:
+                gps.longitude,
 
-                showMessage(
-                  "registrationMessage",
-                  result && result.message
-                    ? result.message
-                    : "Registration failed. Please try again.",
-                  false
-                );
-
-                return;
-              }
-
-
-              if (result.member) {
-
-                localStorage.setItem(
-                  MEMBER_KEY,
-                  result.member.memberId
-                );
-
-                showMember(
-                  result.member
-                );
-
-              }
-
-
-              showMessage(
-                "checkInMessage",
-                result.message ||
-                  "Registration and check-in successful.",
-                true
-              );
+              accuracy:
+                gps.accuracy
 
             }
 
           );
 
+
+        hideLoading();
+
+
+        /******** RESULT ********/
+
+        if (
+          !result ||
+          !result.success
+        ) {
+
+          showMessage(
+
+            "registrationMessage",
+
+            result &&
+            result.message
+
+              ? result.message
+
+              : "Registration failed. Please try again.",
+
+            false
+
+          );
+
+
+          registerButton.disabled =
+            false;
+
+
+          return;
+
         }
 
-      );
+
+        /******** SAVE MEMBER ********/
+
+        if (
+          result.member &&
+          result.member.memberId
+        ) {
+
+          localStorage.setItem(
+
+            MEMBER_KEY,
+
+            result.member.memberId
+
+          );
+
+
+          showMember(
+            result.member
+          );
+
+        }
+
+
+        showMessage(
+
+          "checkInMessage",
+
+          result.message ||
+            "Registration and check-in successful.",
+
+          true
+
+        );
+
+
+        registerButton.disabled =
+          false;
+
+
+      } catch (error) {
+
+        hideLoading();
+
+
+        showMessage(
+
+          "registrationMessage",
+
+          error.message ||
+            "Unable to connect to the server.",
+
+          false
+
+        );
+
+
+        registerButton.disabled =
+          false;
+
+      }
 
     }
 
 
-    /*
-     * Check in existing member
-     */
+    /************************************************
+     * CHECK IN
+     ************************************************/
 
-    function checkIn() {
+    async function checkIn() {
 
-      const memberId =
+      var memberId =
         localStorage.getItem(
           MEMBER_KEY
         );
@@ -845,15 +1300,11 @@
         forgetMember();
 
         return;
+
       }
 
 
-      const button =
-        document.getElementById(
-          "checkInButton"
-        );
-
-      button.disabled =
+      checkInButton.disabled =
         true;
 
 
@@ -862,35 +1313,52 @@
       );
 
 
-      getLocation(
-        function(gps) {
+      try {
 
-          if (!gps.success) {
+        /******** GPS ********/
 
-            hideLoading();
-
-            button.disabled =
-              false;
-
-            showMessage(
-              "checkInMessage",
-              gps.message,
-              false
-            );
-
-            return;
-          }
+        var gps =
+          await getLocation();
 
 
-          showLoading(
-            "Checking you in..."
+        if (!gps.success) {
+
+          hideLoading();
+
+          showMessage(
+
+            "checkInMessage",
+
+            gps.message,
+
+            false
+
           );
 
 
-          apiPost(
+          checkInButton.disabled =
+            false;
+
+
+          return;
+
+        }
+
+
+        /******** CHECK IN ********/
+
+        showLoading(
+          "Checking you in..."
+        );
+
+
+        var result =
+          await apiPost(
+
             "checkInMember",
 
             {
+
               memberId:
                 memberId,
 
@@ -902,63 +1370,101 @@
 
               accuracy:
                 gps.accuracy
-            },
-
-            function(result) {
-
-              hideLoading();
-
-              button.disabled =
-                false;
-
-
-              if (!result || !result.success) {
-
-                showMessage(
-                  "checkInMessage",
-                  result && result.message
-                    ? result.message
-                    : "Check-in failed. Please try again.",
-                  false
-                );
-
-                return;
-              }
-
-
-              showMessage(
-                "checkInMessage",
-                result.message ||
-                  "Check-in successful!",
-                true
-              );
 
             }
 
           );
 
+
+        hideLoading();
+
+
+        /******** RESULT ********/
+
+        if (
+          !result ||
+          !result.success
+        ) {
+
+          showMessage(
+
+            "checkInMessage",
+
+            result &&
+            result.message
+
+              ? result.message
+
+              : "Check-in failed. Please try again.",
+
+            false
+
+          );
+
+
+          checkInButton.disabled =
+            false;
+
+
+          return;
+
         }
 
-      );
+
+        showMessage(
+
+          "checkInMessage",
+
+          result.message ||
+            "Check-in successful!",
+
+          true
+
+        );
+
+
+        checkInButton.disabled =
+          false;
+
+
+      } catch (error) {
+
+        hideLoading();
+
+
+        showMessage(
+
+          "checkInMessage",
+
+          error.message ||
+            "Unable to connect to the server.",
+
+          false
+
+        );
+
+
+        checkInButton.disabled =
+          false;
+
+      }
 
     }
 
 
-    /*
-     * Show saved member
-     */
+    /************************************************
+     * SHOW MEMBER
+     ************************************************/
 
-    function showMember(member) {
+    function showMember(
+      member
+    ) {
 
-      document.getElementById(
-        "registrationCard"
-      ).style.display =
+      registrationCard.style.display =
         "none";
 
 
-      document.getElementById(
-        "memberCard"
-      ).style.display =
+      memberCard.style.display =
         "block";
 
 
@@ -967,31 +1473,45 @@
       ).innerHTML =
 
         "<strong>" +
-        escapeHtml(member.name || "") +
+        escapeHtml(
+          member.name || ""
+        ) +
         "</strong><br>" +
 
         "Member ID: " +
+
         "<span class='member-id'>" +
-        escapeHtml(member.memberId || "") +
+
+        escapeHtml(
+          member.memberId || ""
+        ) +
+
         "</span><br>" +
 
         "Mobile: " +
-        escapeHtml(member.mobile || "") +
+
+        escapeHtml(
+          member.mobile || ""
+        ) +
+
         "<br>" +
 
         "Location: " +
-        escapeHtml(member.location || "");
+
+        escapeHtml(
+          member.location || ""
+        );
 
     }
 
 
-    /*
-     * Load saved member from phone
-     */
+    /************************************************
+     * LOAD SAVED MEMBER
+     ************************************************/
 
-    function loadSavedMember() {
+    async function loadSavedMember() {
 
-      const memberId =
+      var memberId =
         localStorage.getItem(
           MEMBER_KEY
         );
@@ -1002,43 +1522,61 @@
       }
 
 
-      apiPost(
-        "getMember",
+      try {
 
-        {
-          memberId:
-            memberId
-        },
+        var member =
+          await apiPost(
 
-        function(member) {
+            "getMember",
 
-          if (
-            member &&
-            member.memberId
-          ) {
+            {
 
-            showMember(
-              member
-            );
+              memberId:
+                memberId
 
-          } else {
+            }
 
-            localStorage.removeItem(
-              MEMBER_KEY
-            );
+          );
 
-          }
+
+        if (
+          member &&
+          member.memberId
+        ) {
+
+          showMember(
+            member
+          );
+
+        } else {
+
+          localStorage.removeItem(
+            MEMBER_KEY
+          );
 
         }
 
-      );
+      } catch (error) {
+
+        /*
+         * If the server is temporarily
+         * unavailable, don't delete the
+         * saved member ID.
+         */
+
+        console.log(
+          "Could not load saved member:",
+          error
+        );
+
+      }
 
     }
 
 
-    /*
-     * Forget saved member
-     */
+    /************************************************
+     * FORGET MEMBER
+     ************************************************/
 
     function forgetMember() {
 
@@ -1047,79 +1585,135 @@
       );
 
 
-      document.getElementById(
-        "memberCard"
-      ).style.display =
+      memberCard.style.display =
         "none";
 
 
-      document.getElementById(
-        "registrationCard"
-      ).style.display =
+      registrationCard.style.display =
         "block";
 
 
       document.getElementById(
         "name"
-      ).value =
-        "";
+      ).value = "";
+
 
       document.getElementById(
         "mobile"
-      ).value =
-        "";
+      ).value = "";
+
 
       document.getElementById(
         "location"
-      ).value =
-        "";
+      ).value = "";
+
+
+      document.getElementById(
+        "registrationMessage"
+      ).className =
+        "message";
+
+
+      document.getElementById(
+        "checkInMessage"
+      ).className =
+        "message";
 
     }
 
 
-    /*
-     * Escape text before putting it into HTML
-     */
+    /************************************************
+     * HTML ESCAPE
+     ************************************************/
 
-    function escapeHtml(text) {
+    function escapeHtml(
+      text
+    ) {
 
       return String(text)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+
+        .replace(
+          /&/g,
+          "&amp;"
+        )
+
+        .replace(
+          /</g,
+          "&lt;"
+        )
+
+        .replace(
+          />/g,
+          "&gt;"
+        )
+
+        .replace(
+          /"/g,
+          "&quot;"
+        )
+
+        .replace(
+          /'/g,
+          "&#039;"
+        );
 
     }
 
 
-    /*
-     * Start app
-     */
+    /************************************************
+     * SERVICE WORKER
+     ************************************************/
+
+    if (
+      "serviceWorker" in navigator
+    ) {
+
+      window.addEventListener(
+        "load",
+        function () {
+
+          navigator.serviceWorker
+
+            .register(
+              "./sw.js"
+            )
+
+            .then(
+              function () {
+
+                console.log(
+                  "LFNC service worker registered."
+                );
+
+              }
+            )
+
+            .catch(
+              function (error) {
+
+                console.log(
+                  "Service worker registration failed:",
+                  error
+                );
+
+              }
+            );
+
+        }
+      );
+
+    }
+
+
+    /************************************************
+     * START
+     ************************************************/
 
     window.addEventListener(
       "load",
-      function() {
+      function () {
 
         loadSavedMember();
-
-
-        if (
-          "serviceWorker" in navigator
-        ) {
-
-          navigator.serviceWorker
-            .register("./sw.js")
-            .catch(function(error) {
-
-              console.log(
-                "Service worker registration failed:",
-                error
-              );
-
-            });
-
-        }
 
       }
     );
@@ -1127,4 +1721,5 @@
   </script>
 
 </body>
+
 </html>

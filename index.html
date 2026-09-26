@@ -758,235 +758,64 @@
    * GET FRESH GPS LOCATION
    ************************************************/
 
-  function getLocation(callback) {
+ function getLocation(callback) {
+  if (!navigator.geolocation) {
+    alert("GPS is not supported on this device.");
+    return;
+  }
 
-    if (!navigator.geolocation) {
+  let finished = false;
 
-      alert(
-        "GPS is not supported on this device."
-      );
+  const finish = (result) => {
+    if (finished) return;
+    finished = true;
+    callback(result);
+  };
 
-      return;
+  const timeoutTimer = setTimeout(() => {
+    finish({
+      success: false,
+      message:
+        "Unable to get your location. Please make sure Location is ON and try again outdoors."
+    });
+  }, 35000);
 
-    }
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      clearTimeout(timeoutTimer);
 
+      finish({
+        success: true,
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+        accuracy: position.coords.accuracy
+      });
+    },
+    (error) => {
+      clearTimeout(timeoutTimer);
 
-    document.getElementById(
-      "gpsMessage"
-    ).textContent =
-      "Requesting your current GPS location...";
+      let message = "Unable to get your location.";
 
-
-    navigator.geolocation.getCurrentPosition(
-
-      function(position) {
-
-        document.getElementById(
-          "gpsMessage"
-        ).textContent =
-          "GPS location received.";
-
-        callback(position);
-
-      },
-
-      function(error) {
-
-        let message =
-          "Unable to get your GPS location.";
-
-
-        if (
-          error.code ===
-          error.PERMISSION_DENIED
-        ) {
-
-          message =
-            "Location permission was denied. Please allow location access.";
-
-        }
-
-
-        if (
-          error.code ===
-          error.POSITION_UNAVAILABLE
-        ) {
-
-          message =
-            "Location is unavailable. Please turn on GPS.";
-
-        }
-
-
-        if (
-          error.code ===
-          error.TIMEOUT
-        ) {
-
-          message =
-            "GPS request timed out. Please try again.";
-
-        }
-
-
-        alert(message);
-
-
-        document.getElementById(
-          "gpsMessage"
-        ).textContent =
-          message;
-
-      },
-
-      {
-        enableHighAccuracy: true,
-        timeout: 30000,
-        maximumAge: 0
+      if (error.code === 1) {
+        message =
+          "Location permission was denied. Please allow location access and try again.";
+      } else if (error.code === 2) {
+        message =
+          "Your location could not be determined. Please try again outdoors.";
+      } else if (error.code === 3) {
+        message =
+          "Location request timed out. Please try again.";
       }
 
-    );
-
-  }
-
-
-  /************************************************
-   * SHOW MEMBER
-   ************************************************/
-
-  function showMember(member) {
-
-    document.getElementById(
-      "registrationCard"
-    ).classList.add(
-      "hidden"
-    );
-
-
-    document.getElementById(
-      "memberCard"
-    ).classList.remove(
-      "hidden"
-    );
-
-
-    document.getElementById(
-      "memberName"
-    ).textContent =
-      member.name;
-
-
-    document.getElementById(
-      "memberId"
-    ).textContent =
-      "Member ID: " +
-      member.memberId;
-
-
-    document.getElementById(
-      "statusMessage"
-    ).textContent =
-      "Ready to check in.";
-
-  }
-
-
-  /************************************************
-   * FORGET MEMBER
-   ************************************************/
-
-  function forgetMember() {
-
-    const answer =
-      confirm(
-        "Remove this member from this phone?"
-      );
-
-
-    if (!answer) {
-      return;
+      finish({
+        success: false,
+        message: message
+      });
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 30000,
+      maximumAge: 0
     }
-
-
-    localStorage.removeItem(
-      MEMBER_KEY
-    );
-
-
-    document.getElementById(
-      "memberCard"
-    ).classList.add(
-      "hidden"
-    );
-
-
-    document.getElementById(
-      "registrationCard"
-    ).classList.remove(
-      "hidden"
-    );
-
-  }
-
-
-  /************************************************
-   * LOADING
-   ************************************************/
-
-  function showLoading(message) {
-
-    document.getElementById(
-      "loadingText"
-    ).textContent =
-      message;
-
-
-    document.getElementById(
-      "loading"
-    ).classList.remove(
-      "hidden"
-    );
-
-  }
-
-
-  function hideLoading() {
-
-    document.getElementById(
-      "loading"
-    ).classList.add(
-      "hidden"
-    );
-
-  }
-
-
-  /************************************************
-   * SERVICE WORKER
-   ************************************************/
-
-  function registerServiceWorker() {
-
-    if (
-      "serviceWorker" in navigator
-    ) {
-
-      navigator.serviceWorker
-        .register("sw.js")
-        .catch(function(error) {
-
-          console.log(
-            "Service worker error:",
-            error
-          );
-
-        });
-
-    }
-
-  }
-
-</script>
-
-</body>
-</html>
+  );
+}

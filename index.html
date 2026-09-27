@@ -1,276 +1,182 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<meta
-name="viewport"
-content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  <meta name="theme-color" content="#173b70">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
->
-
-  <meta name="theme-color" content="#ffffff">
-
-<meta
-name="description"
-content="Church attendance and check-in for Living Faith Nepali Church Koramangala Bangalore."
-
->
+  <title>LFNC Church Attendance</title>
 
   <link rel="manifest" href="./manifest.json">
-
-  <title>LFNC Church Check-In</title>
 
   <style>
     * {
       box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
     }
 
-    html,
     body {
       margin: 0;
-      padding: 0;
-      min-height: 100%;
-      font-family: Arial, sans-serif;
-      background: #f5f7fb;
-      color: #222;
-    }
-
-    body {
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-    }
-
-    .app {
-      width: 100%;
-      max-width: 520px;
-      min-height: 100vh;
-      background: #fff;
-      padding:
-        max(20px, env(safe-area-inset-top))
-        18px
-        max(40px, env(safe-area-inset-bottom));
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f3f6fa;
+      color: #172033;
     }
 
     .header {
+      background: #173b70;
+      color: white;
+      padding: 25px 18px;
       text-align: center;
-      margin-bottom: 22px;
     }
 
-    .logo {
-      width: 105px;
-      height: 105px;
-      object-fit: contain;
-      display: block;
-      margin: 0 auto 14px;
+    .header h1 {
+      margin: 0;
+      font-size: 25px;
     }
 
-    h1 {
-      font-size: 23px;
-      line-height: 1.3;
-      margin: 0 0 8px;
+    .header p {
+      margin: 8px 0 0;
+      font-size: 14px;
+      opacity: .9;
     }
 
-    .service {
-      font-size: 16px;
-      font-weight: bold;
-      margin-bottom: 6px;
-    }
-
-    .address {
-      font-size: 13px;
-      line-height: 1.5;
-      color: #666;
+    .container {
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 18px;
     }
 
     .card {
-      background: #fff;
-      border: 1px solid #e1e5eb;
+      background: white;
       border-radius: 16px;
       padding: 20px;
-      margin-top: 18px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      margin-bottom: 16px;
+      box-shadow: 0 3px 15px rgba(0,0,0,.08);
     }
 
     .card h2 {
-      margin: 0 0 16px;
-      font-size: 19px;
+      margin-top: 0;
+      font-size: 20px;
     }
 
     label {
       display: block;
+      margin-top: 14px;
+      margin-bottom: 6px;
       font-weight: bold;
       font-size: 14px;
-      margin: 14px 0 7px;
     }
 
     input {
       width: 100%;
-      min-height: 50px;
       padding: 14px;
-      border: 1px solid #cfd5dd;
+      border: 1px solid #ccd4df;
       border-radius: 10px;
       font-size: 16px;
       outline: none;
-      background: #fff;
-      color: #222;
-      -webkit-appearance: none;
+      background: white;
     }
 
     input:focus {
-      border-color: #555;
-      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+      border-color: #173b70;
     }
 
     button {
       width: 100%;
-      min-height: 52px;
       border: 0;
-      border-radius: 11px;
+      border-radius: 10px;
       padding: 15px;
+      margin-top: 16px;
       font-size: 16px;
       font-weight: bold;
       cursor: pointer;
-      margin-top: 18px;
-      background: #111;
-      color: #fff;
-      touch-action: manipulation;
-      -webkit-appearance: none;
-    }
-
-    button:active {
-      transform: scale(0.99);
+      background: #173b70;
+      color: white;
+      min-height: 50px;
     }
 
     button:disabled {
-      opacity: 0.6;
+      opacity: .6;
       cursor: not-allowed;
-      transform: none;
     }
 
     .secondary {
-      background: #eeeeee;
-      color: #222;
+      background: #e8edf5;
+      color: #173b70;
     }
 
-    .location-button {
-      background: #1769aa;
-    }
-
-    .message {
-      margin-top: 16px;
+    .location-box {
+      margin-top: 15px;
       padding: 13px;
       border-radius: 10px;
+      background: #f1f5f9;
       font-size: 14px;
-      line-height: 1.55;
+      line-height: 1.5;
+    }
+
+    .status {
       display: none;
-      word-break: break-word;
-    }
-
-    .message.show {
-      display: block;
-    }
-
-    .message.success {
-      background: #e8f7e8;
-      color: #176b17;
-    }
-
-    .message.error {
-      background: #fdecec;
-      color: #9b1c1c;
-    }
-
-    .message.info {
-      background: #eef6ff;
-      color: #14558a;
-    }
-
-    .member-card {
-      display: none;
-    }
-
-    .member-info {
-      line-height: 1.7;
-      font-size: 15px;
-      background: #f7f8fa;
       padding: 14px;
       border-radius: 10px;
-    }
-
-    .member-id {
-      font-weight: bold;
-    }
-
-    .footer {
-      text-align: center;
-      color: #777;
-      font-size: 12px;
-      margin-top: 28px;
-      line-height: 1.5;
-      padding-bottom: 10px;
-    }
-
-    .location-status {
-      display: none;
-      margin-top: 12px;
-      padding: 12px;
-      border-radius: 10px;
-      background: #eef6ff;
-      color: #14558a;
-      font-size: 13px;
+      margin-bottom: 15px;
+      font-size: 14px;
       line-height: 1.5;
     }
 
-    .location-status.show {
+    .status.show {
       display: block;
     }
 
-    .loading-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(255, 255, 255, 0.96);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      padding: 30px;
-      text-align: center;
+    .status.info {
+      background: #e8f1ff;
+      color: #174a8b;
     }
 
-    .loading-overlay.show {
-      display: flex;
+    .status.success {
+      background: #e7f7ed;
+      color: #176b38;
     }
 
-    .loading-box {
-      width: 100%;
-      max-width: 340px;
-      font-size: 16px;
+    .status.error {
+      background: #fdecec;
+      color: #a32222;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .small {
+      font-size: 13px;
+      color: #657184;
       line-height: 1.5;
+    }
+
+    .member-box {
+      background: #f7f9fc;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 15px;
+    }
+
+    .member-box strong {
+      color: #173b70;
     }
 
     .spinner {
-      width: 44px;
-      height: 44px;
-      border: 4px solid #ddd;
-      border-top-color: #111;
+      display: inline-block;
+      width: 17px;
+      height: 17px;
+      border: 3px solid rgba(255,255,255,.4);
+      border-top-color: white;
       border-radius: 50%;
-      margin: 0 auto 16px;
-      animation: spin 0.8s linear infinite;
-    }
-
-    .loading-small {
-      margin-top: 8px;
-      font-size: 12px;
-      color: #777;
-    }
-
-    .gps-icon {
-      font-size: 34px;
-      margin-bottom: 10px;
+      animation: spin .8s linear infinite;
+      vertical-align: middle;
+      margin-right: 7px;
     }
 
     @keyframes spin {
@@ -279,1333 +185,429 @@ content="Church attendance and check-in for Living Faith Nepali Church Koramanga
       }
     }
 
-    @media (max-width: 380px) {
-      .app {
-        padding-left: 14px;
-        padding-right: 14px;
-      }
-
-      .card {
-        padding: 16px;
-      }
-
-      h1 {
-        font-size: 21px;
-      }
+    .footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+      color: #7b8492;
     }
   </style>
-
 </head>
 
 <body>
 
-  <div class="app">
-
-```
 <div class="header">
+  <h1>Living Faith Nepali Church</h1>
+  <p>Koramangala, Bangalore</p>
+</div>
 
-  <img
-    class="logo"
-    src="./icons/icon-192.png"
-    alt="Living Faith Nepali Church logo"
-    onerror="this.style.display='none'"
-  >
+<div class="container">
 
-  <h1>
-    Living Faith Nepali Church<br>
-    Koramangala Bangalore
-  </h1>
+  <div id="status" class="status"></div>
 
-  <div class="service">
-    Sunday Service
+  <!-- REGISTRATION -->
+  <div id="registerCard" class="card">
+
+    <h2>Register & Check In</h2>
+
+    <p class="small">
+      First-time visitors can register below.
+      Your phone location must be enabled while checking in.
+    </p>
+
+    <label for="name">Full Name</label>
+    <input
+      id="name"
+      type="text"
+      autocomplete="name"
+      placeholder="Enter your full name"
+    >
+
+    <label for="mobile">Mobile Number</label>
+    <input
+      id="mobile"
+      type="tel"
+      inputmode="tel"
+      autocomplete="tel"
+      placeholder="Enter your mobile number"
+    >
+
+    <label for="location">Your Location / Area</label>
+    <input
+      id="location"
+      type="text"
+      autocomplete="address-level2"
+      placeholder="Example: Koramangala"
+    >
+
+    <button id="registerButton" onclick="registerAndCheckIn()">
+      Register & Check In
+    </button>
+
   </div>
 
-  <div class="address">
-    5th Floor, Kay Arr Cornerstone,<br>
-    Maharaja Signal, 80 Feet Road,<br>
-    Koramangala 4th Block,<br>
-    Bengaluru 560034
+  <!-- RETURNING MEMBER -->
+  <div id="memberCard" class="card hidden">
+
+    <h2>Welcome Back</h2>
+
+    <div id="memberInfo" class="member-box"></div>
+
+    <button id="checkInButton" onclick="checkIn()">
+      Check In
+    </button>
+
+    <button class="secondary" onclick="logout()">
+      Use Different Member
+    </button>
+
+  </div>
+
+  <!-- LOCATION -->
+  <div class="card">
+
+    <h2>Location</h2>
+
+    <div id="locationStatus" class="location-box">
+      Location has not been checked yet.
+    </div>
+
+    <button
+      id="locationButton"
+      class="secondary"
+      onclick="testLocation()">
+      Test My Location
+    </button>
+
+  </div>
+
+  <div class="card">
+    <h2>Church</h2>
+
+    <p class="small">
+      Check-in is available when you are physically
+      near the church location.
+    </p>
+
+    <p class="small">
+      <strong>Important:</strong>
+      On iPhone, please use Safari and allow
+      Location access for this website.
+    </p>
   </div>
 
 </div>
-
-
-<!-- REGISTRATION -->
-
-<div
-  class="card"
-  id="registrationCard"
->
-
-  <h2>
-    Register & Check In
-  </h2>
-
-  <label for="name">
-    Name
-  </label>
-
-  <input
-    id="name"
-    type="text"
-    placeholder="Enter your name"
-    autocomplete="name"
-    autocapitalize="words"
-  >
-
-  <label for="mobile">
-    Mobile Number
-  </label>
-
-  <input
-    id="mobile"
-    type="tel"
-    placeholder="Enter your mobile number"
-    autocomplete="tel"
-    inputmode="tel"
-  >
-
-  <label for="location">
-    Location
-  </label>
-
-  <input
-    id="location"
-    type="text"
-    placeholder="Example: Koramangala"
-    autocomplete="address-level2"
-    autocapitalize="words"
-  >
-
-  <button
-    id="registerButton"
-    type="button"
-  >
-    📍 REGISTER & CHECK IN
-  </button>
-
-  <div
-    id="locationStatusRegistration"
-    class="location-status"
-  ></div>
-
-  <div
-    id="registrationMessage"
-    class="message"
-  ></div>
-
-</div>
-
-
-<!-- MEMBER -->
-
-<div
-  class="card member-card"
-  id="memberCard"
->
-
-  <h2>
-    Welcome
-  </h2>
-
-  <div
-    class="member-info"
-    id="memberInfo"
-  ></div>
-
-  <button
-    id="checkInButton"
-    type="button"
-  >
-    📍 CHECK IN
-  </button>
-
-  <div
-    id="locationStatusMember"
-    class="location-status"
-  ></div>
-
-  <button
-    id="forgetButton"
-    class="secondary"
-    type="button"
-  >
-    THIS IS NOT ME
-  </button>
-
-  <div
-    id="checkInMessage"
-    class="message"
-  ></div>
-
-</div>
-
 
 <div class="footer">
-  Your phone location is verified when you check in.
-  <br>
-  Please allow location access when your browser asks.
+  Living Faith Nepali Church Attendance System
 </div>
-```
-
-  </div>
-
-  <!-- LOADING -->
-
-  <div
-    class="loading-overlay"
-    id="loadingOverlay"
-  >
-
-```
-<div class="loading-box">
-
-  <div class="gps-icon">
-    📍
-  </div>
-
-  <div class="spinner"></div>
-
-  <div id="loadingText">
-    Getting your location...
-  </div>
-
-  <div class="loading-small">
-    Please keep this page open and make sure GPS/Location is ON.
-  </div>
-
-</div>
-```
-
-  </div>
-
-  <script>
-
-    /************************************************
-     * CONFIGURATION
-     ************************************************/
-
-    const APPS_SCRIPT_URL =
-      "https://script.google.com/macros/s/AKfycbwRQpqB5xLZJ5XD2qd3wOHeoA6W8b9KebrFaNb1HSQ9GkwsXicepPDYSsNjP66yfN9S1w/exec";
-
-    const MEMBER_KEY =
-      "churchMemberId";
 
 
-    /************************************************
-     * DOM
-     ************************************************/
+<script>
 
-    const registrationCard =
-      document.getElementById("registrationCard");
-
-    const memberCard =
-      document.getElementById("memberCard");
-
-    const registerButton =
-      document.getElementById("registerButton");
-
-    const checkInButton =
-      document.getElementById("checkInButton");
-
-    const forgetButton =
-      document.getElementById("forgetButton");
+  /*
+   * GOOGLE APPS SCRIPT WEB APP
+   */
+  const API_URL =
+    "https://script.google.com/macros/s/AKfycbwRQpqB5xLZJ5XD2qd3wOHeoA6W8b9KebrFaNb1HSQ9GkwsXicepPDYSsNjP66yfN9S1w/exec";
 
 
-    /************************************************
-     * BUTTON EVENTS
-     ************************************************/
+  /*
+   * LOCAL MEMBER STORAGE
+   */
+  const MEMBER_KEY = "churchMemberId";
 
-    registerButton.addEventListener(
-      "click",
-      registerMember
+
+  /*
+   * TIMEOUTS
+   */
+  const GPS_TIMEOUT = 30000;
+  const API_TIMEOUT = 20000;
+
+
+  /*
+   * STATUS MESSAGE
+   */
+  function showStatus(message, type) {
+
+    const box =
+      document.getElementById("status");
+
+    box.className =
+      "status show " + type;
+
+    box.innerHTML =
+      message;
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }
+
+
+  function clearStatus() {
+
+    const box =
+      document.getElementById("status");
+
+    box.className =
+      "status";
+
+    box.innerHTML =
+      "";
+  }
+
+
+  /*
+   * BUTTON LOADING
+   */
+  function setButtonLoading(
+    button,
+    loadingText
+  ) {
+
+    if (!button) return;
+
+    button.disabled = true;
+
+    button.dataset.originalText =
+      button.innerHTML;
+
+    button.innerHTML =
+      '<span class="spinner"></span>' +
+      loadingText;
+  }
+
+
+  function resetButton(button) {
+
+    if (!button) return;
+
+    button.disabled = false;
+
+    if (button.dataset.originalText) {
+
+      button.innerHTML =
+        button.dataset.originalText;
+
+    }
+  }
+
+
+  /*
+   * INITIALIZE
+   */
+  document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+      loadSavedMember();
+
+      if (
+        !window.isSecureContext
+      ) {
+
+        showStatus(
+          "This website is not running in a secure HTTPS connection. Please open the GitHub Pages HTTPS address.",
+          "error"
+        );
+
+      }
+
+    }
+  );
+
+
+  /*
+   * LOAD SAVED MEMBER
+   */
+  async function loadSavedMember() {
+
+    const memberId =
+      localStorage.getItem(
+        MEMBER_KEY
+      );
+
+    if (!memberId) {
+      return;
+    }
+
+    try {
+
+      const result =
+        await apiRequest(
+          "getMember",
+          {
+            memberId: memberId
+          }
+        );
+
+      if (
+        result &&
+        result.success &&
+        result.member
+      ) {
+
+        displayMember(
+          result.member
+        );
+
+      } else {
+
+        localStorage.removeItem(
+          MEMBER_KEY
+        );
+
+      }
+
+    } catch (error) {
+
+      console.log(
+        "Could not load saved member:",
+        error
+      );
+
+    }
+  }
+
+
+  /*
+   * DISPLAY MEMBER
+   */
+  function displayMember(member) {
+
+    document
+      .getElementById("registerCard")
+      .classList
+      .add("hidden");
+
+    document
+      .getElementById("memberCard")
+      .classList
+      .remove("hidden");
+
+    document
+      .getElementById("memberInfo")
+      .innerHTML =
+        "<strong>Name:</strong> " +
+        escapeHtml(member.name) +
+        "<br>" +
+        "<strong>Mobile:</strong> " +
+        escapeHtml(member.mobile) +
+        "<br>" +
+        "<strong>Member ID:</strong> " +
+        escapeHtml(member.memberId);
+  }
+
+
+  /*
+   * REGISTER
+   */
+  async function registerAndCheckIn() {
+
+    const button =
+      document.getElementById(
+        "registerButton"
+      );
+
+    const name =
+      document
+        .getElementById("name")
+        .value
+        .trim();
+
+    const mobile =
+      document
+        .getElementById("mobile")
+        .value
+        .trim();
+
+    const location =
+      document
+        .getElementById("location")
+        .value
+        .trim();
+
+
+    if (!name) {
+
+      showStatus(
+        "Please enter your full name.",
+        "error"
+      );
+
+      return;
+    }
+
+
+    if (!mobile) {
+
+      showStatus(
+        "Please enter your mobile number.",
+        "error"
+      );
+
+      return;
+    }
+
+
+    if (!location) {
+
+      showStatus(
+        "Please enter your location or area.",
+        "error"
+      );
+
+      return;
+    }
+
+
+    setButtonLoading(
+      button,
+      "Getting your location..."
     );
 
-    checkInButton.addEventListener(
-      "click",
-      checkIn
-    );
 
-    forgetButton.addEventListener(
-      "click",
-      forgetMember
-    );
+    try {
 
-
-    /************************************************
-     * HTTPS / SECURE CONTEXT CHECK
-     ************************************************/
-
-    function checkSecureLocationAccess() {
-
-      /*
-       * GitHub Pages uses HTTPS, so this should normally
-       * return true.
-       */
-
-      if (
-        window.isSecureContext === false &&
-        location.hostname !== "localhost" &&
-        location.hostname !== "127.0.0.1"
-      ) {
-
-        return {
-          success: false,
-          message:
-            "Location access requires a secure HTTPS connection. Please open the official HTTPS website."
-        };
-
-      }
-
-      return {
-        success: true
-      };
-
-    }
-
-
-    /************************************************
-     * API REQUEST - JSONP
-     ************************************************/
-
-    function apiRequest(
-      action,
-      data
-    ) {
-
-      return new Promise(
-        function(resolve, reject) {
-
-          const callbackName =
-            "lflcCallback_" +
-            Date.now() +
-            "_" +
-            Math.floor(
-              Math.random() * 100000
-            );
-
-          const script =
-            document.createElement("script");
-
-          let finished = false;
-
-          let timeout;
-
-
-          function cleanup() {
-
-            try {
-              delete window[callbackName];
-            } catch (error) {
-              console.log(error);
-            }
-
-            if (
-              script &&
-              script.parentNode
-            ) {
-              script.parentNode.removeChild(script);
-            }
-
-          }
-
-
-          function finishSuccess(result) {
-
-            if (finished) {
-              return;
-            }
-
-            finished = true;
-
-            clearTimeout(timeout);
-
-            cleanup();
-
-            resolve(result);
-
-          }
-
-
-          function finishError(message) {
-
-            if (finished) {
-              return;
-            }
-
-            finished = true;
-
-            clearTimeout(timeout);
-
-            cleanup();
-
-            reject(
-              new Error(message)
-            );
-
-          }
-
-
-          window[callbackName] =
-            function(result) {
-
-              finishSuccess(result);
-
-            };
-
-
-          const params =
-            new URLSearchParams();
-
-
-          params.set(
-            "callback",
-            callbackName
-          );
-
-
-          params.set(
-            "action",
-            action
-          );
-
-
-          if (
-            data &&
-            data.name !== undefined
-          ) {
-            params.set(
-              "name",
-              data.name
-            );
-          }
-
-
-          if (
-            data &&
-            data.mobile !== undefined
-          ) {
-            params.set(
-              "mobile",
-              data.mobile
-            );
-          }
-
-
-          if (
-            data &&
-            data.location !== undefined
-          ) {
-            params.set(
-              "location",
-              data.location
-            );
-          }
-
-
-          if (
-            data &&
-            data.latitude !== undefined
-          ) {
-            params.set(
-              "latitude",
-              String(data.latitude)
-            );
-          }
-
-
-          if (
-            data &&
-            data.longitude !== undefined
-          ) {
-            params.set(
-              "longitude",
-              String(data.longitude)
-            );
-          }
-
-
-          if (
-            data &&
-            data.accuracy !== undefined
-          ) {
-            params.set(
-              "accuracy",
-              String(data.accuracy)
-            );
-          }
-
-
-          if (
-            data &&
-            data.memberId !== undefined
-          ) {
-            params.set(
-              "memberId",
-              data.memberId
-            );
-          }
-
-
-          script.src =
-            APPS_SCRIPT_URL +
-            "?" +
-            params.toString();
-
-
-          script.async = true;
-
-
-          script.onerror =
-            function() {
-
-              finishError(
-                "Unable to connect to the attendance server. Please check your internet connection and try again."
-              );
-
-            };
-
-
-          document.body.appendChild(script);
-
-
-          timeout =
-            setTimeout(
-              function() {
-
-                finishError(
-                  "The attendance server did not respond. Please try again."
-                );
-
-              },
-              30000
-            );
-
-        }
-      );
-
-    }
-
-
-    /************************************************
-     * LOADING
-     ************************************************/
-
-    function showLoading(message) {
-
-      document.getElementById(
-        "loadingText"
-      ).textContent =
-        message;
-
-      document.getElementById(
-        "loadingOverlay"
-      ).classList.add("show");
-
-    }
-
-
-    function hideLoading() {
-
-      document.getElementById(
-        "loadingOverlay"
-      ).classList.remove("show");
-
-    }
-
-
-    /************************************************
-     * MESSAGE
-     ************************************************/
-
-    function showMessage(
-      elementId,
-      message,
-      success,
-      info
-    ) {
-
-      const element =
-        document.getElementById(
-          elementId
-        );
-
-      element.textContent =
-        message || "";
-
-      let type = "error";
-
-      if (success) {
-        type = "success";
-      }
-
-      if (info) {
-        type = "info";
-      }
-
-      element.className =
-        "message show " + type;
-
-    }
-
-
-    function clearMessage(elementId) {
-
-      const element =
-        document.getElementById(
-          elementId
-        );
-
-      element.textContent = "";
-
-      element.className = "message";
-
-    }
-
-
-    /************************************************
-     * LOCATION STATUS
-     ************************************************/
-
-    function showLocationStatus(
-      elementId,
-      message
-    ) {
-
-      const element =
-        document.getElementById(
-          elementId
-        );
-
-      element.textContent =
-        message;
-
-      element.classList.add("show");
-
-    }
-
-
-    function hideLocationStatus(
-      elementId
-    ) {
-
-      const element =
-        document.getElementById(
-          elementId
-        );
-
-      element.textContent = "";
-
-      element.classList.remove("show");
-
-    }
-
-
-    /************************************************
-     * GPS ERROR MESSAGE
-     ************************************************/
-
-    function getLocationErrorMessage(error) {
-
-      if (!error) {
-
-        return (
-          "Unable to get your location. " +
-          "Please turn on Location/GPS and try again."
-        );
-
-      }
-
-
-      if (error.code === 1) {
-
-        return (
-          "Location permission was denied.\n\n" +
-          "Please allow Location for this website, " +
-          "then press the button again.\n\n" +
-          "Android Chrome: tap the 🔒 icon → Permissions → Location → Allow.\n\n" +
-          "iPhone Safari: Settings → Privacy & Security → Location Services → Safari."
-        );
-
-      }
-
-
-      if (error.code === 2) {
-
-        return (
-          "Your phone could not determine its location.\n\n" +
-          "Please turn ON Location/GPS, make sure Wi-Fi or mobile data is ON, " +
-          "and try again."
-        );
-
-      }
-
-
-      if (error.code === 3) {
-
-        return (
-          "Getting your GPS location took too long.\n\n" +
-          "Move to an area with a clearer GPS signal and press TRY LOCATION AGAIN."
-        );
-
-      }
-
-
-      return (
-        "Unable to get your location. " +
-        "Please turn ON Location/GPS and try again."
-      );
-
-    }
-
-
-    /************************************************
-     * GET GPS POSITION
-     *
-     * IMPORTANT:
-     * We use several attempts because mobile browsers
-     * can behave differently from desktop browsers.
-     ************************************************/
-
-    function getPosition(
-      options
-    ) {
-
-      return new Promise(
-        function(resolve, reject) {
-
-          if (
-            !navigator.geolocation
-          ) {
-
-            reject({
-              code: 0,
-              message:
-                "Geolocation is not supported."
-            });
-
-            return;
-
-          }
-
-
-          navigator.geolocation.getCurrentPosition(
-
-            function(position) {
-
-              resolve(position);
-
-            },
-
-            function(error) {
-
-              reject(error);
-
-            },
-
-            options
-
-          );
-
-        }
-      );
-
-    }
-
-
-    /************************************************
-     * WATCH POSITION FALLBACK
-     ************************************************/
-
-    function getPositionUsingWatch() {
-
-      return new Promise(
-        function(resolve, reject) {
-
-          if (
-            !navigator.geolocation
-          ) {
-
-            reject({
-              code: 0
-            });
-
-            return;
-
-          }
-
-
-          let watchId = null;
-          let finished = false;
-
-          let bestPosition = null;
-
-
-          function finishSuccess(position) {
-
-            if (finished) {
-              return;
-            }
-
-            finished = true;
-
-            if (watchId !== null) {
-
-              navigator.geolocation.clearWatch(
-                watchId
-              );
-
-            }
-
-            resolve(position);
-
-          }
-
-
-          function finishError(error) {
-
-            if (finished) {
-              return;
-            }
-
-            finished = true;
-
-            if (watchId !== null) {
-
-              navigator.geolocation.clearWatch(
-                watchId
-              );
-
-            }
-
-            reject(error);
-
-          }
-
-
-          watchId =
-            navigator.geolocation.watchPosition(
-
-              function(position) {
-
-                bestPosition = position;
-
-
-                /*
-                 * If the phone gives us a reasonably
-                 * accurate position, use it immediately.
-                 */
-
-                if (
-                  position.coords &&
-                  position.coords.accuracy &&
-                  position.coords.accuracy <= 100
-                ) {
-
-                  finishSuccess(
-                    position
-                  );
-
-                }
-
-              },
-
-
-              function(error) {
-
-                finishError(error);
-
-              },
-
-
-              {
-
-                enableHighAccuracy: true,
-
-                maximumAge: 10000,
-
-                timeout: 20000
-
-              }
-
-            );
-
-
-          /*
-           * Give watchPosition up to 20 seconds.
-           */
-
-          setTimeout(
-            function() {
-
-              if (finished) {
-                return;
-              }
-
-
-              if (bestPosition) {
-
-                finishSuccess(
-                  bestPosition
-                );
-
-              }
-
-              else {
-
-                finishError({
-                  code: 3
-                });
-
-              }
-
-            },
-            20000
-          );
-
-        }
-      );
-
-    }
-
-
-    /************************************************
-     * MAIN LOCATION FUNCTION
-     ************************************************/
-
-    async function getLocation() {
-
-      const secureCheck =
-        checkSecureLocationAccess();
-
-
-      if (!secureCheck.success) {
-
-        return secureCheck;
-
-      }
-
-
-      if (
-        !navigator.geolocation
-      ) {
-
-        return {
-
-          success: false,
-
-          message:
-            "GPS/location is not supported by this browser. Please use Chrome on Android or Safari/Chrome on iPhone."
-
-        };
-
-      }
-
-
-      /*
-       * Attempt 1:
-       * High accuracy GPS.
-       */
-
-      showLoading(
-        "📍 Getting your precise location..."
+      showStatus(
+        "Please allow location access when your phone asks.",
+        "info"
       );
 
 
-      try {
-
-        const position =
-          await getPosition({
-
-            enableHighAccuracy: true,
-
-            timeout: 15000,
-
-            maximumAge: 0
-
-          });
+      const gps =
+        await getLocation();
 
 
-        return convertPosition(position);
-
-      }
-
-      catch (firstError) {
-
-        console.log(
-          "High accuracy location attempt failed:",
-          firstError
-        );
-
-      }
-
-
-      /*
-       * Attempt 2:
-       * Allow a recent location.
-       *
-       * This is particularly useful on some phones
-       * where GPS needs a little time to start.
-       */
-
-      showLoading(
-        "📍 GPS is taking longer than usual. Trying again..."
+      updateLocationDisplay(
+        gps
       );
 
 
-      try {
-
-        const position =
-          await getPosition({
-
-            enableHighAccuracy: false,
-
-            timeout: 15000,
-
-            maximumAge: 60000
-
-          });
+      button.innerHTML =
+        '<span class="spinner"></span>Checking in...';
 
 
-        return convertPosition(position);
-
-      }
-
-      catch (secondError) {
-
-        console.log(
-          "Low accuracy location attempt failed:",
-          secondError
-        );
-
-      }
-
-
-      /*
-       * Attempt 3:
-       * watchPosition fallback.
-       */
-
-      showLoading(
-        "📍 Waiting for your phone's GPS signal..."
-      );
-
-
-      try {
-
-        const position =
-          await getPositionUsingWatch();
-
-
-        return convertPosition(position);
-
-      }
-
-      catch (thirdError) {
-
-        console.log(
-          "watchPosition failed:",
-          thirdError
-        );
-
-
-        return {
-
-          success: false,
-
-          code:
-            thirdError.code || 3,
-
-          message:
-            getLocationErrorMessage(
-              thirdError
-            )
-
-        };
-
-      }
-
-    }
-
-
-    /************************************************
-     * CONVERT GPS POSITION
-     ************************************************/
-
-    function convertPosition(
-      position
-    ) {
-
-      if (
-        !position ||
-        !position.coords
-      ) {
-
-        return {
-
-          success: false,
-
-          message:
-            "The phone returned an invalid location. Please try again."
-
-        };
-
-      }
-
-
-      const latitude =
-        Number(
-          position.coords.latitude
-        );
-
-      const longitude =
-        Number(
-          position.coords.longitude
-        );
-
-      const accuracy =
-        Number(
-          position.coords.accuracy
+      const result =
+        await apiRequest(
+          "registerAndCheckIn",
+          {
+            name: name,
+            mobile: mobile,
+            location: location,
+            latitude: gps.latitude,
+            longitude: gps.longitude,
+            accuracy: gps.accuracy
+          }
         );
 
 
       if (
-        !Number.isFinite(latitude) ||
-        !Number.isFinite(longitude)
+        result &&
+        result.success
       ) {
-
-        return {
-
-          success: false,
-
-          message:
-            "The phone could not provide valid GPS coordinates. Please try again."
-
-        };
-
-      }
-
-
-      /*
-       * Prevent obviously bad GPS results.
-       */
-
-      if (
-        latitude < -90 ||
-        latitude > 90 ||
-        longitude < -180 ||
-        longitude > 180
-      ) {
-
-        return {
-
-          success: false,
-
-          message:
-            "The location returned by the phone is invalid. Please try again."
-
-        };
-
-      }
-
-
-      return {
-
-        success: true,
-
-        latitude: latitude,
-
-        longitude: longitude,
-
-        accuracy:
-          Number.isFinite(accuracy)
-            ? accuracy
-            : 9999
-
-      };
-
-    }
-
-
-    /************************************************
-     * REGISTER
-     ************************************************/
-
-    async function registerMember() {
-
-      clearMessage(
-        "registrationMessage"
-      );
-
-
-      const name =
-        document.getElementById(
-          "name"
-        ).value.trim();
-
-
-      const mobile =
-        document.getElementById(
-          "mobile"
-        ).value.trim();
-
-
-      const location =
-        document.getElementById(
-          "location"
-        ).value.trim();
-
-
-      if (!name) {
-
-        showMessage(
-          "registrationMessage",
-          "Please enter your name.",
-          false
-        );
-
-        return;
-
-      }
-
-
-      if (!mobile) {
-
-        showMessage(
-          "registrationMessage",
-          "Please enter your mobile number.",
-          false
-        );
-
-        return;
-
-      }
-
-
-      if (!location) {
-
-        showMessage(
-          "registrationMessage",
-          "Please enter your location.",
-          false
-        );
-
-        return;
-
-      }
-
-
-      registerButton.disabled = true;
-
-
-      hideLocationStatus(
-        "locationStatusRegistration"
-      );
-
-
-      try {
-
-        const gps =
-          await getLocation();
-
-
-        hideLoading();
-
-
-        if (!gps.success) {
-
-          showMessage(
-            "registrationMessage",
-            gps.message,
-            false
-          );
-
-
-          showLocationStatus(
-            "locationStatusRegistration",
-            "📍 Please turn ON your phone's Location/GPS and allow location access for this website, then press REGISTER & CHECK IN again."
-          );
-
-
-          registerButton.disabled =
-            false;
-
-
-          return;
-
-        }
-
-
-        showLocationStatus(
-          "locationStatusRegistration",
-          "📍 Location found. Accuracy: approximately " +
-          Math.round(gps.accuracy) +
-          " metres."
-        );
-
-
-        showLoading(
-          "Registering and checking you in..."
-        );
-
-
-        const result =
-          await apiRequest(
-
-            "registerAndCheckIn",
-
-            {
-
-              name: name,
-
-              mobile: mobile,
-
-              location: location,
-
-              latitude:
-                gps.latitude,
-
-              longitude:
-                gps.longitude,
-
-              accuracy:
-                gps.accuracy
-
-            }
-
-          );
-
-
-        hideLoading();
-
-
-        if (
-          !result ||
-          !result.success
-        ) {
-
-          showMessage(
-
-            "registrationMessage",
-
-            result &&
-            result.message
-              ? result.message
-              : "Registration failed. Please try again.",
-
-            false
-
-          );
-
-
-          registerButton.disabled =
-            false;
-
-
-          return;
-
-        }
-
 
         if (
           result.member &&
@@ -1613,536 +615,670 @@ content="Church attendance and check-in for Living Faith Nepali Church Koramanga
         ) {
 
           localStorage.setItem(
-
             MEMBER_KEY,
-
             result.member.memberId
-
           );
 
+        }
 
-          showMember(
+
+        showStatus(
+          escapeHtml(
+            result.message ||
+            "Registration successful!"
+          ),
+          "success"
+        );
+
+
+        if (result.member) {
+
+          displayMember(
             result.member
           );
 
         }
 
+      } else {
 
-        showMessage(
-
-          "checkInMessage",
-
-          result.message ||
-            "Registration and check-in successful.",
-
-          true
-
+        throw new Error(
+          result && result.message
+            ? result.message
+            : "The server rejected the check-in."
         );
-
-
-        registerButton.disabled =
-          false;
 
       }
 
+    } catch (error) {
 
-      catch(error) {
+      console.error(error);
 
-        hideLoading();
-
-
-        console.error(
-          "Registration error:",
-          error
-        );
-
-
-        showMessage(
-
-          "registrationMessage",
-
+      showStatus(
+        escapeHtml(
           error.message ||
-            "Unable to connect to the attendance server. Please try again.",
-
-          false
-
-        );
-
-
-        registerButton.disabled =
-          false;
-
-      }
-
-    }
-
-
-    /************************************************
-     * CHECK IN
-     ************************************************/
-
-    async function checkIn() {
-
-      const memberId =
-        localStorage.getItem(
-          MEMBER_KEY
-        );
-
-
-      if (!memberId) {
-
-        forgetMember();
-
-        return;
-
-      }
-
-
-      clearMessage(
-        "checkInMessage"
+          "Registration failed. Please try again."
+        ),
+        "error"
       );
 
+    } finally {
 
-      checkInButton.disabled =
-        true;
-
-
-      hideLocationStatus(
-        "locationStatusMember"
-      );
-
-
-      try {
-
-        const gps =
-          await getLocation();
-
-
-        hideLoading();
-
-
-        if (!gps.success) {
-
-          showMessage(
-
-            "checkInMessage",
-
-            gps.message,
-
-            false
-
-          );
-
-
-          showLocationStatus(
-            "locationStatusMember",
-            "📍 Turn ON Location/GPS and allow this website to access your location, then press CHECK IN again."
-          );
-
-
-          checkInButton.disabled =
-            false;
-
-
-          return;
-
-        }
-
-
-        showLocationStatus(
-          "locationStatusMember",
-          "📍 Location found. Accuracy: approximately " +
-          Math.round(gps.accuracy) +
-          " metres."
-        );
-
-
-        showLoading(
-          "Checking you in..."
-        );
-
-
-        const result =
-          await apiRequest(
-
-            "checkInMember",
-
-            {
-
-              memberId:
-                memberId,
-
-              latitude:
-                gps.latitude,
-
-              longitude:
-                gps.longitude,
-
-              accuracy:
-                gps.accuracy
-
-            }
-
-          );
-
-
-        hideLoading();
-
-
-        if (
-          !result ||
-          !result.success
-        ) {
-
-          showMessage(
-
-            "checkInMessage",
-
-            result &&
-            result.message
-
-              ? result.message
-
-              : "Check-in failed. Please try again.",
-
-            false
-
-          );
-
-
-          checkInButton.disabled =
-            false;
-
-
-          return;
-
-        }
-
-
-        showMessage(
-
-          "checkInMessage",
-
-          result.message ||
-            "Check-in successful!",
-
-          true
-
-        );
-
-
-        checkInButton.disabled =
-          false;
-
-      }
-
-
-      catch(error) {
-
-        hideLoading();
-
-
-        console.error(
-          "Check-in error:",
-          error
-        );
-
-
-        showMessage(
-
-          "checkInMessage",
-
-          error.message ||
-            "Unable to connect to the server. Please try again.",
-
-          false
-
-        );
-
-
-        checkInButton.disabled =
-          false;
-
-      }
+      resetButton(button);
 
     }
+  }
 
 
-    /************************************************
-     * SHOW MEMBER
-     ************************************************/
+  /*
+   * RETURNING MEMBER CHECK-IN
+   */
+  async function checkIn() {
 
-    function showMember(
-      member
-    ) {
-
-      registrationCard.style.display =
-        "none";
-
-
-      memberCard.style.display =
-        "block";
-
-
+    const button =
       document.getElementById(
-        "memberInfo"
-      ).innerHTML =
+        "checkInButton"
+      );
 
-        "<strong>" +
-
-        escapeHtml(
-          member.name || ""
-        ) +
-
-        "</strong><br>" +
-
-        "Member ID: " +
-
-        "<span class='member-id'>" +
-
-        escapeHtml(
-          member.memberId || ""
-        ) +
-
-        "</span><br>" +
-
-        "Mobile: " +
-
-        escapeHtml(
-          member.mobile || ""
-        ) +
-
-        "<br>" +
-
-        "Location: " +
-
-        escapeHtml(
-          member.location || ""
-        );
-
-    }
-
-
-    /************************************************
-     * LOAD SAVED MEMBER
-     ************************************************/
-
-    async function loadSavedMember() {
-
-      const memberId =
-        localStorage.getItem(
-          MEMBER_KEY
-        );
-
-
-      if (!memberId) {
-        return;
-      }
-
-
-      try {
-
-        const member =
-          await apiRequest(
-
-            "getMember",
-
-            {
-
-              memberId:
-                memberId
-
-            }
-
-          );
-
-
-        if (
-          member &&
-          member.memberId
-        ) {
-
-          showMember(
-            member
-          );
-
-        }
-
-        else {
-
-          localStorage.removeItem(
-            MEMBER_KEY
-          );
-
-        }
-
-      }
-
-      catch(error) {
-
-        console.log(
-          "Could not load saved member:",
-          error
-        );
-
-      }
-
-    }
-
-
-    /************************************************
-     * FORGET MEMBER
-     ************************************************/
-
-    function forgetMember() {
-
-      localStorage.removeItem(
+    const memberId =
+      localStorage.getItem(
         MEMBER_KEY
       );
 
 
-      memberCard.style.display =
-        "none";
+    if (!memberId) {
 
+      logout();
 
-      registrationCard.style.display =
-        "block";
-
-
-      document.getElementById(
-        "name"
-      ).value = "";
-
-
-      document.getElementById(
-        "mobile"
-      ).value = "";
-
-
-      document.getElementById(
-        "location"
-      ).value = "";
-
-
-      clearMessage(
-        "registrationMessage"
-      );
-
-
-      clearMessage(
-        "checkInMessage"
-      );
-
-
-      hideLocationStatus(
-        "locationStatusRegistration"
-      );
-
-
-      hideLocationStatus(
-        "locationStatusMember"
-      );
-
+      return;
     }
 
 
-    /************************************************
-     * HTML ESCAPE
-     ************************************************/
+    setButtonLoading(
+      button,
+      "Getting your location..."
+    );
 
-    function escapeHtml(
-      text
-    ) {
 
-      return String(text)
+    try {
 
-        .replace(
-          /&/g,
-          "&amp;"
-        )
+      showStatus(
+        "Getting your current GPS location...",
+        "info"
+      );
 
-        .replace(
-          /</g,
-          "&lt;"
-        )
 
-        .replace(
-          />/g,
-          "&gt;"
-        )
+      const gps =
+        await getLocation();
 
-        .replace(
-          /"/g,
-          "&quot;"
-        )
 
-        .replace(
-          /'/g,
-          "&#039;"
+      updateLocationDisplay(
+        gps
+      );
+
+
+      button.innerHTML =
+        '<span class="spinner"></span>Checking in...';
+
+
+      const result =
+        await apiRequest(
+          "checkInMember",
+          {
+            memberId:
+              memberId,
+
+            latitude:
+              gps.latitude,
+
+            longitude:
+              gps.longitude,
+
+            accuracy:
+              gps.accuracy
+          }
         );
 
-    }
 
+      if (
+        result &&
+        result.success
+      ) {
 
-    /************************************************
-     * SERVICE WORKER
-     ************************************************/
+        showStatus(
+          escapeHtml(
+            result.message ||
+            "Check-in successful!"
+          ),
+          "success"
+        );
 
-    if (
-      "serviceWorker" in navigator
-    ) {
+      } else {
 
-      window.addEventListener(
-        "load",
-        function() {
+        throw new Error(
+          result && result.message
+            ? result.message
+            : "Check-in was not accepted."
+        );
 
-          navigator.serviceWorker
+      }
 
-            .register(
-              "./sw.js"
-            )
+    } catch (error) {
 
-            .then(
-              function() {
+      console.error(error);
 
-                console.log(
-                  "LFNC service worker registered."
-                );
-
-              }
-            )
-
-            .catch(
-              function(error) {
-
-                console.log(
-                  "Service worker registration failed:",
-                  error
-                );
-
-              }
-            );
-
-        }
+      showStatus(
+        escapeHtml(
+          error.message ||
+          "Check-in failed. Please try again."
+        ),
+        "error"
       );
 
+    } finally {
+
+      resetButton(button);
+
     }
+  }
 
 
-    /************************************************
-     * START
-     ************************************************/
+  /*
+   * GPS
+   *
+   * This is deliberately done before
+   * calling Apps Script.
+   */
+  function getLocation() {
+
+    return new Promise(
+      function(resolve, reject) {
+
+        if (
+          !navigator.geolocation
+        ) {
+
+          reject(
+            new Error(
+              "Your phone/browser does not support GPS location."
+            )
+          );
+
+          return;
+        }
+
+
+        if (
+          !window.isSecureContext
+        ) {
+
+          reject(
+            new Error(
+              "Location requires HTTPS. Please open the HTTPS GitHub Pages website."
+            )
+          );
+
+          return;
+        }
+
+
+        let finished =
+          false;
+
+
+        function success(position) {
+
+          if (finished) return;
+
+          finished = true;
+
+
+          const latitude =
+            Number(
+              position.coords.latitude
+            );
+
+          const longitude =
+            Number(
+              position.coords.longitude
+            );
+
+          const accuracy =
+            Number(
+              position.coords.accuracy
+            );
+
+
+          if (
+            !isFinite(latitude) ||
+            !isFinite(longitude) ||
+            !isFinite(accuracy)
+          ) {
+
+            reject(
+              new Error(
+                "Your phone returned an invalid GPS location."
+              )
+            );
+
+            return;
+          }
+
+
+          resolve({
+            latitude:
+              latitude,
+
+            longitude:
+              longitude,
+
+            accuracy:
+              accuracy
+          });
+
+        }
+
+
+        function failure(error) {
+
+          if (finished) return;
+
+          finished = true;
+
+
+          let message =
+            "Unable to get your location.";
+
+
+          if (
+            error &&
+            error.code ===
+              1
+          ) {
+
+            message =
+              "Location permission was denied. Please allow Location for this website in your phone settings and try again.";
+
+          } else if (
+            error &&
+            error.code ===
+              2
+          ) {
+
+            message =
+              "Your phone could not determine your location. Turn ON GPS/Location and try again.";
+
+          } else if (
+            error &&
+            error.code ===
+              3
+          ) {
+
+            message =
+              "GPS took too long to respond. Turn ON Location, move near a window or outside, and try again.";
+
+          }
+
+
+          reject(
+            new Error(message)
+          );
+
+        }
+
+
+        navigator.geolocation.getCurrentPosition(
+          success,
+          failure,
+          {
+            enableHighAccuracy: true,
+            timeout: GPS_TIMEOUT,
+            maximumAge: 0
+          }
+        );
+
+      }
+    );
+  }
+
+
+  /*
+   * TEST LOCATION BUTTON
+   */
+  async function testLocation() {
+
+    const button =
+      document.getElementById(
+        "locationButton"
+      );
+
+
+    setButtonLoading(
+      button,
+      "Finding location..."
+    );
+
+
+    try {
+
+      showStatus(
+        "Please allow location access.",
+        "info"
+      );
+
+
+      const gps =
+        await getLocation();
+
+
+      updateLocationDisplay(
+        gps
+      );
+
+
+      showStatus(
+        "Location found successfully.",
+        "success"
+      );
+
+
+    } catch (error) {
+
+      showStatus(
+        escapeHtml(
+          error.message
+        ),
+        "error"
+      );
+
+    } finally {
+
+      resetButton(button);
+
+    }
+  }
+
+
+  /*
+   * SHOW GPS DETAILS
+   */
+  function updateLocationDisplay(gps) {
+
+    document
+      .getElementById(
+        "locationStatus"
+      )
+      .innerHTML =
+        "<strong>GPS detected</strong><br>" +
+        "Accuracy: approximately " +
+        Math.round(gps.accuracy) +
+        " metres<br>" +
+        "Latitude: " +
+        gps.latitude.toFixed(6) +
+        "<br>" +
+        "Longitude: " +
+        gps.longitude.toFixed(6);
+  }
+
+
+  /*
+   * API REQUEST
+   *
+   * Uses JSONP because Apps Script
+   * cross-origin requests can otherwise
+   * cause browser CORS problems.
+   */
+  function apiRequest(action, params) {
+
+    return new Promise(
+      function(resolve, reject) {
+
+        const callbackName =
+          "lflcCallback_" +
+          Date.now() +
+          "_" +
+          Math.floor(
+            Math.random() * 100000
+          );
+
+
+        const query =
+          new URLSearchParams();
+
+
+        query.set(
+          "action",
+          action
+        );
+
+
+        query.set(
+          "callback",
+          callbackName
+        );
+
+
+        Object.keys(params || {})
+          .forEach(
+            function(key) {
+
+              const value =
+                params[key];
+
+              if (
+                value !== undefined &&
+                value !== null
+              ) {
+
+                query.set(
+                  key,
+                  String(value)
+                );
+
+              }
+
+            }
+          );
+
+
+        const script =
+          document.createElement(
+            "script"
+          );
+
+
+        let completed =
+          false;
+
+
+        const timer =
+          setTimeout(
+            function() {
+
+              if (completed) return;
+
+              completed = true;
+
+              cleanup();
+
+
+              reject(
+                new Error(
+                  "The church server did not respond. Please check your internet connection and try again."
+                )
+              );
+
+            },
+            API_TIMEOUT
+          );
+
+
+        window[callbackName] =
+          function(data) {
+
+            if (completed) return;
+
+            completed = true;
+
+            clearTimeout(timer);
+
+            cleanup();
+
+            resolve(data);
+
+          };
+
+
+        script.onerror =
+          function() {
+
+            if (completed) return;
+
+            completed = true;
+
+            clearTimeout(timer);
+
+            cleanup();
+
+            reject(
+              new Error(
+                "Could not connect to the church attendance server."
+              )
+            );
+
+          };
+
+
+        function cleanup() {
+
+          try {
+            delete window[
+              callbackName
+            ];
+          } catch (e) {
+            window[
+              callbackName
+            ] = undefined;
+          }
+
+
+          if (
+            script.parentNode
+          ) {
+
+            script.parentNode
+              .removeChild(
+                script
+              );
+
+          }
+
+        }
+
+
+        script.src =
+          API_URL +
+          "?" +
+          query.toString();
+
+
+        document.head.appendChild(
+          script
+        );
+
+      }
+    );
+  }
+
+
+  /*
+   * LOGOUT
+   */
+  function logout() {
+
+    localStorage.removeItem(
+      MEMBER_KEY
+    );
+
+
+    document
+      .getElementById("memberCard")
+      .classList
+      .add("hidden");
+
+
+    document
+      .getElementById("registerCard")
+      .classList
+      .remove("hidden");
+
+
+    clearStatus();
+
+  }
+
+
+  /*
+   * SECURITY
+   */
+  function escapeHtml(value) {
+
+    return String(
+      value || ""
+    )
+      .replace(
+        /&/g,
+        "&amp;"
+      )
+      .replace(
+        /</g,
+        "&lt;"
+      )
+      .replace(
+        />/g,
+        "&gt;"
+      )
+      .replace(
+        /"/g,
+        "&quot;"
+      )
+      .replace(
+        /'/g,
+        "&#039;"
+      );
+
+  }
+
+
+  /*
+   * SERVICE WORKER
+   */
+  if (
+    "serviceWorker" in navigator
+  ) {
 
     window.addEventListener(
       "load",
       function() {
 
-        loadSavedMember();
+        navigator.serviceWorker
+          .register(
+            "./sw.js"
+          )
+          .catch(
+            function(error) {
+              console.log(
+                "Service worker:",
+                error
+              );
+            }
+          );
 
       }
     );
 
-  </script>
+  }
+
+</script>
 
 </body>
 </html>

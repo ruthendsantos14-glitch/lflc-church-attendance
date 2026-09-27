@@ -1,29 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
 
+<html lang="en">
 <head>
   <meta charset="UTF-8">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-  >
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+
+>
 
   <meta name="theme-color" content="#ffffff">
 
-  <meta
-    name="description"
-    content="Church attendance and check-in for Living Faith Nepali Church Koramangala Bangalore."
-  >
+<meta
+name="description"
+content="Church attendance and check-in for Living Faith Nepali Church Koramangala Bangalore."
+
+>
 
   <link rel="manifest" href="./manifest.json">
 
   <title>LFNC Church Check-In</title>
 
   <style>
-
     * {
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
     }
 
     html,
@@ -47,17 +49,20 @@
       max-width: 520px;
       min-height: 100vh;
       background: #fff;
-      padding: 24px 18px 40px;
+      padding:
+        max(20px, env(safe-area-inset-top))
+        18px
+        max(40px, env(safe-area-inset-bottom));
     }
 
     .header {
       text-align: center;
-      margin-bottom: 24px;
+      margin-bottom: 22px;
     }
 
     .logo {
-      width: 110px;
-      height: 110px;
+      width: 105px;
+      height: 105px;
       object-fit: contain;
       display: block;
       margin: 0 auto 14px;
@@ -104,16 +109,25 @@
 
     input {
       width: 100%;
+      min-height: 50px;
       padding: 14px;
       border: 1px solid #cfd5dd;
       border-radius: 10px;
       font-size: 16px;
       outline: none;
       background: #fff;
+      color: #222;
+      -webkit-appearance: none;
+    }
+
+    input:focus {
+      border-color: #555;
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
     }
 
     button {
       width: 100%;
+      min-height: 52px;
       border: 0;
       border-radius: 11px;
       padding: 15px;
@@ -123,12 +137,18 @@
       margin-top: 18px;
       background: #111;
       color: #fff;
-      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      -webkit-appearance: none;
+    }
+
+    button:active {
+      transform: scale(0.99);
     }
 
     button:disabled {
       opacity: 0.6;
       cursor: not-allowed;
+      transform: none;
     }
 
     .secondary {
@@ -136,12 +156,16 @@
       color: #222;
     }
 
+    .location-button {
+      background: #1769aa;
+    }
+
     .message {
       margin-top: 16px;
-      padding: 12px;
+      padding: 13px;
       border-radius: 10px;
       font-size: 14px;
-      line-height: 1.5;
+      line-height: 1.55;
       display: none;
       word-break: break-word;
     }
@@ -160,6 +184,11 @@
       color: #9b1c1c;
     }
 
+    .message.info {
+      background: #eef6ff;
+      color: #14558a;
+    }
+
     .member-card {
       display: none;
     }
@@ -167,6 +196,9 @@
     .member-info {
       line-height: 1.7;
       font-size: 15px;
+      background: #f7f8fa;
+      padding: 14px;
+      border-radius: 10px;
     }
 
     .member-id {
@@ -179,12 +211,28 @@
       font-size: 12px;
       margin-top: 28px;
       line-height: 1.5;
+      padding-bottom: 10px;
+    }
+
+    .location-status {
+      display: none;
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #eef6ff;
+      color: #14558a;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .location-status.show {
+      display: block;
     }
 
     .loading-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(255, 255, 255, 0.94);
+      background: rgba(255, 255, 255, 0.96);
       display: none;
       align-items: center;
       justify-content: center;
@@ -198,19 +246,31 @@
     }
 
     .loading-box {
-      max-width: 320px;
+      width: 100%;
+      max-width: 340px;
       font-size: 16px;
       line-height: 1.5;
     }
 
     .spinner {
-      width: 42px;
-      height: 42px;
+      width: 44px;
+      height: 44px;
       border: 4px solid #ddd;
       border-top-color: #111;
       border-radius: 50%;
       margin: 0 auto 16px;
       animation: spin 0.8s linear infinite;
+    }
+
+    .loading-small {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #777;
+    }
+
+    .gps-icon {
+      font-size: 34px;
+      margin-bottom: 10px;
     }
 
     @keyframes spin {
@@ -219,155 +279,176 @@
       }
     }
 
+    @media (max-width: 380px) {
+      .app {
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+
+      .card {
+        padding: 16px;
+      }
+
+      h1 {
+        font-size: 21px;
+      }
+    }
   </style>
 
 </head>
-
 
 <body>
 
   <div class="app">
 
-    <div class="header">
+```
+<div class="header">
 
-      <img
-        class="logo"
-        src="./icons/icon-192.png"
-        alt="Living Faith Nepali Church logo"
-      >
+  <img
+    class="logo"
+    src="./icons/icon-192.png"
+    alt="Living Faith Nepali Church logo"
+    onerror="this.style.display='none'"
+  >
 
-      <h1>
-        Living Faith Nepali Church<br>
-        Koramangala Bangalore
-      </h1>
+  <h1>
+    Living Faith Nepali Church<br>
+    Koramangala Bangalore
+  </h1>
 
-      <div class="service">
-        Sunday Service
-      </div>
-
-      <div class="address">
-        5th Floor, Kay Arr Cornerstone,<br>
-        Maharaja Signal, 80 Feet Road,<br>
-        Koramangala 4th Block,<br>
-        Bengaluru 560034
-      </div>
-
-    </div>
-
-
-    <!-- REGISTRATION -->
-
-    <div
-      class="card"
-      id="registrationCard"
-    >
-
-      <h2>
-        Register & Check In
-      </h2>
-
-
-      <label for="name">
-        Name
-      </label>
-
-      <input
-        id="name"
-        type="text"
-        placeholder="Enter your name"
-        autocomplete="name"
-      >
-
-
-      <label for="mobile">
-        Mobile Number
-      </label>
-
-      <input
-        id="mobile"
-        type="tel"
-        placeholder="Enter your mobile number"
-        autocomplete="tel"
-      >
-
-
-      <label for="location">
-        Location
-      </label>
-
-      <input
-        id="location"
-        type="text"
-        placeholder="Example: Koramangala"
-        autocomplete="address-level2"
-      >
-
-
-      <button
-        id="registerButton"
-        type="button"
-      >
-        REGISTER & CHECK IN
-      </button>
-
-
-      <div
-        id="registrationMessage"
-        class="message"
-      ></div>
-
-    </div>
-
-
-    <!-- MEMBER -->
-
-    <div
-      class="card member-card"
-      id="memberCard"
-    >
-
-      <h2>
-        Welcome
-      </h2>
-
-
-      <div
-        class="member-info"
-        id="memberInfo"
-      ></div>
-
-
-      <button
-        id="checkInButton"
-        type="button"
-      >
-        CHECK IN
-      </button>
-
-
-      <button
-        id="forgetButton"
-        class="secondary"
-        type="button"
-      >
-        THIS IS NOT ME
-      </button>
-
-
-      <div
-        id="checkInMessage"
-        class="message"
-      ></div>
-
-    </div>
-
-
-    <div class="footer">
-      Fresh location verification is required for every check-in.
-    </div>
-
+  <div class="service">
+    Sunday Service
   </div>
 
+  <div class="address">
+    5th Floor, Kay Arr Cornerstone,<br>
+    Maharaja Signal, 80 Feet Road,<br>
+    Koramangala 4th Block,<br>
+    Bengaluru 560034
+  </div>
+
+</div>
+
+
+<!-- REGISTRATION -->
+
+<div
+  class="card"
+  id="registrationCard"
+>
+
+  <h2>
+    Register & Check In
+  </h2>
+
+  <label for="name">
+    Name
+  </label>
+
+  <input
+    id="name"
+    type="text"
+    placeholder="Enter your name"
+    autocomplete="name"
+    autocapitalize="words"
+  >
+
+  <label for="mobile">
+    Mobile Number
+  </label>
+
+  <input
+    id="mobile"
+    type="tel"
+    placeholder="Enter your mobile number"
+    autocomplete="tel"
+    inputmode="tel"
+  >
+
+  <label for="location">
+    Location
+  </label>
+
+  <input
+    id="location"
+    type="text"
+    placeholder="Example: Koramangala"
+    autocomplete="address-level2"
+    autocapitalize="words"
+  >
+
+  <button
+    id="registerButton"
+    type="button"
+  >
+    📍 REGISTER & CHECK IN
+  </button>
+
+  <div
+    id="locationStatusRegistration"
+    class="location-status"
+  ></div>
+
+  <div
+    id="registrationMessage"
+    class="message"
+  ></div>
+
+</div>
+
+
+<!-- MEMBER -->
+
+<div
+  class="card member-card"
+  id="memberCard"
+>
+
+  <h2>
+    Welcome
+  </h2>
+
+  <div
+    class="member-info"
+    id="memberInfo"
+  ></div>
+
+  <button
+    id="checkInButton"
+    type="button"
+  >
+    📍 CHECK IN
+  </button>
+
+  <div
+    id="locationStatusMember"
+    class="location-status"
+  ></div>
+
+  <button
+    id="forgetButton"
+    class="secondary"
+    type="button"
+  >
+    THIS IS NOT ME
+  </button>
+
+  <div
+    id="checkInMessage"
+    class="message"
+  ></div>
+
+</div>
+
+
+<div class="footer">
+  Your phone location is verified when you check in.
+  <br>
+  Please allow location access when your browser asks.
+</div>
+```
+
+  </div>
 
   <!-- LOADING -->
 
@@ -376,18 +457,27 @@
     id="loadingOverlay"
   >
 
-    <div class="loading-box">
+```
+<div class="loading-box">
 
-      <div class="spinner"></div>
-
-      <div id="loadingText">
-        Checking your location...
-      </div>
-
-    </div>
-
+  <div class="gps-icon">
+    📍
   </div>
 
+  <div class="spinner"></div>
+
+  <div id="loadingText">
+    Getting your location...
+  </div>
+
+  <div class="loading-small">
+    Please keep this page open and make sure GPS/Location is ON.
+  </div>
+
+</div>
+```
+
+  </div>
 
   <script>
 
@@ -423,7 +513,7 @@
 
 
     /************************************************
-     * BUTTONS
+     * BUTTON EVENTS
      ************************************************/
 
     registerButton.addEventListener(
@@ -443,10 +533,39 @@
 
 
     /************************************************
-     * JSONP API
-     *
-     * This avoids the cross-origin POST response
-     * problem between GitHub Pages and Apps Script.
+     * HTTPS / SECURE CONTEXT CHECK
+     ************************************************/
+
+    function checkSecureLocationAccess() {
+
+      /*
+       * GitHub Pages uses HTTPS, so this should normally
+       * return true.
+       */
+
+      if (
+        window.isSecureContext === false &&
+        location.hostname !== "localhost" &&
+        location.hostname !== "127.0.0.1"
+      ) {
+
+        return {
+          success: false,
+          message:
+            "Location access requires a secure HTTPS connection. Please open the official HTTPS website."
+        };
+
+      }
+
+      return {
+        success: true
+      };
+
+    }
+
+
+    /************************************************
+     * API REQUEST - JSONP
      ************************************************/
 
     function apiRequest(
@@ -465,47 +584,33 @@
               Math.random() * 100000
             );
 
-
           const script =
             document.createElement("script");
 
+          let finished = false;
 
-          let finished =
-            false;
+          let timeout;
 
 
           function cleanup() {
 
             try {
-
-              delete window[
-                callbackName
-              ];
-
+              delete window[callbackName];
             } catch (error) {
-
               console.log(error);
-
             }
-
 
             if (
               script &&
               script.parentNode
             ) {
-
-              script.parentNode.removeChild(
-                script
-              );
-
+              script.parentNode.removeChild(script);
             }
 
           }
 
 
-          function finishSuccess(
-            result
-          ) {
+          function finishSuccess(result) {
 
             if (finished) {
               return;
@@ -513,9 +618,7 @@
 
             finished = true;
 
-            clearTimeout(
-              timeout
-            );
+            clearTimeout(timeout);
 
             cleanup();
 
@@ -524,9 +627,7 @@
           }
 
 
-          function finishError(
-            message
-          ) {
+          function finishError(message) {
 
             if (finished) {
               return;
@@ -534,9 +635,7 @@
 
             finished = true;
 
-            clearTimeout(
-              timeout
-            );
+            clearTimeout(timeout);
 
             cleanup();
 
@@ -547,14 +646,10 @@
           }
 
 
-          window[
-            callbackName
-          ] =
+          window[callbackName] =
             function(result) {
 
-              finishSuccess(
-                result
-              );
+              finishSuccess(result);
 
             };
 
@@ -579,12 +674,10 @@
             data &&
             data.name !== undefined
           ) {
-
             params.set(
               "name",
               data.name
             );
-
           }
 
 
@@ -592,12 +685,10 @@
             data &&
             data.mobile !== undefined
           ) {
-
             params.set(
               "mobile",
               data.mobile
             );
-
           }
 
 
@@ -605,12 +696,10 @@
             data &&
             data.location !== undefined
           ) {
-
             params.set(
               "location",
               data.location
             );
-
           }
 
 
@@ -618,14 +707,10 @@
             data &&
             data.latitude !== undefined
           ) {
-
             params.set(
               "latitude",
-              String(
-                data.latitude
-              )
+              String(data.latitude)
             );
-
           }
 
 
@@ -633,14 +718,10 @@
             data &&
             data.longitude !== undefined
           ) {
-
             params.set(
               "longitude",
-              String(
-                data.longitude
-              )
+              String(data.longitude)
             );
-
           }
 
 
@@ -648,14 +729,10 @@
             data &&
             data.accuracy !== undefined
           ) {
-
             params.set(
               "accuracy",
-              String(
-                data.accuracy
-              )
+              String(data.accuracy)
             );
-
           }
 
 
@@ -663,12 +740,10 @@
             data &&
             data.memberId !== undefined
           ) {
-
             params.set(
               "memberId",
               data.memberId
             );
-
           }
 
 
@@ -678,31 +753,28 @@
             params.toString();
 
 
-          script.async =
-            true;
+          script.async = true;
 
 
           script.onerror =
             function() {
 
               finishError(
-                "Unable to connect to the attendance server."
+                "Unable to connect to the attendance server. Please check your internet connection and try again."
               );
 
             };
 
 
-          document.body.appendChild(
-            script
-          );
+          document.body.appendChild(script);
 
 
-          const timeout =
+          timeout =
             setTimeout(
               function() {
 
                 finishError(
-                  "The server did not respond. Please try again."
+                  "The attendance server did not respond. Please try again."
                 );
 
               },
@@ -719,21 +791,16 @@
      * LOADING
      ************************************************/
 
-    function showLoading(
-      message
-    ) {
+    function showLoading(message) {
 
       document.getElementById(
         "loadingText"
       ).textContent =
         message;
 
-
       document.getElementById(
         "loadingOverlay"
-      ).classList.add(
-        "show"
-      );
+      ).classList.add("show");
 
     }
 
@@ -742,9 +809,7 @@
 
       document.getElementById(
         "loadingOverlay"
-      ).classList.remove(
-        "show"
-      );
+      ).classList.remove("show");
 
     }
 
@@ -756,7 +821,8 @@
     function showMessage(
       elementId,
       message,
-      success
+      success,
+      info
     ) {
 
       const element =
@@ -764,42 +830,158 @@
           elementId
         );
 
-
       element.textContent =
         message || "";
 
+      let type = "error";
+
+      if (success) {
+        type = "success";
+      }
+
+      if (info) {
+        type = "info";
+      }
 
       element.className =
-        "message show " +
-        (
-          success
-            ? "success"
-            : "error"
+        "message show " + type;
+
+    }
+
+
+    function clearMessage(elementId) {
+
+      const element =
+        document.getElementById(
+          elementId
         );
+
+      element.textContent = "";
+
+      element.className = "message";
 
     }
 
 
     /************************************************
-     * GPS
+     * LOCATION STATUS
      ************************************************/
 
-    function getLocation() {
+    function showLocationStatus(
+      elementId,
+      message
+    ) {
+
+      const element =
+        document.getElementById(
+          elementId
+        );
+
+      element.textContent =
+        message;
+
+      element.classList.add("show");
+
+    }
+
+
+    function hideLocationStatus(
+      elementId
+    ) {
+
+      const element =
+        document.getElementById(
+          elementId
+        );
+
+      element.textContent = "";
+
+      element.classList.remove("show");
+
+    }
+
+
+    /************************************************
+     * GPS ERROR MESSAGE
+     ************************************************/
+
+    function getLocationErrorMessage(error) {
+
+      if (!error) {
+
+        return (
+          "Unable to get your location. " +
+          "Please turn on Location/GPS and try again."
+        );
+
+      }
+
+
+      if (error.code === 1) {
+
+        return (
+          "Location permission was denied.\n\n" +
+          "Please allow Location for this website, " +
+          "then press the button again.\n\n" +
+          "Android Chrome: tap the 🔒 icon → Permissions → Location → Allow.\n\n" +
+          "iPhone Safari: Settings → Privacy & Security → Location Services → Safari."
+        );
+
+      }
+
+
+      if (error.code === 2) {
+
+        return (
+          "Your phone could not determine its location.\n\n" +
+          "Please turn ON Location/GPS, make sure Wi-Fi or mobile data is ON, " +
+          "and try again."
+        );
+
+      }
+
+
+      if (error.code === 3) {
+
+        return (
+          "Getting your GPS location took too long.\n\n" +
+          "Move to an area with a clearer GPS signal and press TRY LOCATION AGAIN."
+        );
+
+      }
+
+
+      return (
+        "Unable to get your location. " +
+        "Please turn ON Location/GPS and try again."
+      );
+
+    }
+
+
+    /************************************************
+     * GET GPS POSITION
+     *
+     * IMPORTANT:
+     * We use several attempts because mobile browsers
+     * can behave differently from desktop browsers.
+     ************************************************/
+
+    function getPosition(
+      options
+    ) {
 
       return new Promise(
-        function(resolve) {
+        function(resolve, reject) {
 
           if (
             !navigator.geolocation
           ) {
 
-            resolve({
-
-              success: false,
-
+            reject({
+              code: 0,
               message:
-                "GPS is not supported on this device."
-
+                "Geolocation is not supported."
             });
 
             return;
@@ -807,133 +989,21 @@
           }
 
 
-          let finished =
-            false;
-
-
-          function finish(
-            result
-          ) {
-
-            if (finished) {
-              return;
-            }
-
-            finished = true;
-
-            resolve(result);
-
-          }
-
-
-          const safetyTimer =
-            setTimeout(
-              function() {
-
-                finish({
-
-                  success: false,
-
-                  message:
-                    "Location request timed out. Please make sure Location is ON and try again."
-
-                });
-
-              },
-              35000
-            );
-
-
           navigator.geolocation.getCurrentPosition(
 
             function(position) {
 
-              clearTimeout(
-                safetyTimer
-              );
-
-
-              finish({
-
-                success: true,
-
-                latitude:
-                  position.coords.latitude,
-
-                longitude:
-                  position.coords.longitude,
-
-                accuracy:
-                  position.coords.accuracy
-
-              });
+              resolve(position);
 
             },
-
 
             function(error) {
 
-              clearTimeout(
-                safetyTimer
-              );
-
-
-              let message =
-                "Unable to get your location.";
-
-
-              if (
-                error.code === 1
-              ) {
-
-                message =
-                  "Location permission was denied. Please allow location access and try again.";
-
-              }
-
-              else if (
-                error.code === 2
-              ) {
-
-                message =
-                  "Your location could not be determined. Please try again.";
-
-              }
-
-              else if (
-                error.code === 3
-              ) {
-
-                message =
-                  "Location request timed out. Please try again.";
-
-              }
-
-
-              finish({
-
-                success: false,
-
-                message:
-                  message
-
-              });
+              reject(error);
 
             },
 
-
-            {
-
-              enableHighAccuracy:
-                true,
-
-              timeout:
-                30000,
-
-              maximumAge:
-                0
-
-            }
+            options
 
           );
 
@@ -944,10 +1014,429 @@
 
 
     /************************************************
+     * WATCH POSITION FALLBACK
+     ************************************************/
+
+    function getPositionUsingWatch() {
+
+      return new Promise(
+        function(resolve, reject) {
+
+          if (
+            !navigator.geolocation
+          ) {
+
+            reject({
+              code: 0
+            });
+
+            return;
+
+          }
+
+
+          let watchId = null;
+          let finished = false;
+
+          let bestPosition = null;
+
+
+          function finishSuccess(position) {
+
+            if (finished) {
+              return;
+            }
+
+            finished = true;
+
+            if (watchId !== null) {
+
+              navigator.geolocation.clearWatch(
+                watchId
+              );
+
+            }
+
+            resolve(position);
+
+          }
+
+
+          function finishError(error) {
+
+            if (finished) {
+              return;
+            }
+
+            finished = true;
+
+            if (watchId !== null) {
+
+              navigator.geolocation.clearWatch(
+                watchId
+              );
+
+            }
+
+            reject(error);
+
+          }
+
+
+          watchId =
+            navigator.geolocation.watchPosition(
+
+              function(position) {
+
+                bestPosition = position;
+
+
+                /*
+                 * If the phone gives us a reasonably
+                 * accurate position, use it immediately.
+                 */
+
+                if (
+                  position.coords &&
+                  position.coords.accuracy &&
+                  position.coords.accuracy <= 100
+                ) {
+
+                  finishSuccess(
+                    position
+                  );
+
+                }
+
+              },
+
+
+              function(error) {
+
+                finishError(error);
+
+              },
+
+
+              {
+
+                enableHighAccuracy: true,
+
+                maximumAge: 10000,
+
+                timeout: 20000
+
+              }
+
+            );
+
+
+          /*
+           * Give watchPosition up to 20 seconds.
+           */
+
+          setTimeout(
+            function() {
+
+              if (finished) {
+                return;
+              }
+
+
+              if (bestPosition) {
+
+                finishSuccess(
+                  bestPosition
+                );
+
+              }
+
+              else {
+
+                finishError({
+                  code: 3
+                });
+
+              }
+
+            },
+            20000
+          );
+
+        }
+      );
+
+    }
+
+
+    /************************************************
+     * MAIN LOCATION FUNCTION
+     ************************************************/
+
+    async function getLocation() {
+
+      const secureCheck =
+        checkSecureLocationAccess();
+
+
+      if (!secureCheck.success) {
+
+        return secureCheck;
+
+      }
+
+
+      if (
+        !navigator.geolocation
+      ) {
+
+        return {
+
+          success: false,
+
+          message:
+            "GPS/location is not supported by this browser. Please use Chrome on Android or Safari/Chrome on iPhone."
+
+        };
+
+      }
+
+
+      /*
+       * Attempt 1:
+       * High accuracy GPS.
+       */
+
+      showLoading(
+        "📍 Getting your precise location..."
+      );
+
+
+      try {
+
+        const position =
+          await getPosition({
+
+            enableHighAccuracy: true,
+
+            timeout: 15000,
+
+            maximumAge: 0
+
+          });
+
+
+        return convertPosition(position);
+
+      }
+
+      catch (firstError) {
+
+        console.log(
+          "High accuracy location attempt failed:",
+          firstError
+        );
+
+      }
+
+
+      /*
+       * Attempt 2:
+       * Allow a recent location.
+       *
+       * This is particularly useful on some phones
+       * where GPS needs a little time to start.
+       */
+
+      showLoading(
+        "📍 GPS is taking longer than usual. Trying again..."
+      );
+
+
+      try {
+
+        const position =
+          await getPosition({
+
+            enableHighAccuracy: false,
+
+            timeout: 15000,
+
+            maximumAge: 60000
+
+          });
+
+
+        return convertPosition(position);
+
+      }
+
+      catch (secondError) {
+
+        console.log(
+          "Low accuracy location attempt failed:",
+          secondError
+        );
+
+      }
+
+
+      /*
+       * Attempt 3:
+       * watchPosition fallback.
+       */
+
+      showLoading(
+        "📍 Waiting for your phone's GPS signal..."
+      );
+
+
+      try {
+
+        const position =
+          await getPositionUsingWatch();
+
+
+        return convertPosition(position);
+
+      }
+
+      catch (thirdError) {
+
+        console.log(
+          "watchPosition failed:",
+          thirdError
+        );
+
+
+        return {
+
+          success: false,
+
+          code:
+            thirdError.code || 3,
+
+          message:
+            getLocationErrorMessage(
+              thirdError
+            )
+
+        };
+
+      }
+
+    }
+
+
+    /************************************************
+     * CONVERT GPS POSITION
+     ************************************************/
+
+    function convertPosition(
+      position
+    ) {
+
+      if (
+        !position ||
+        !position.coords
+      ) {
+
+        return {
+
+          success: false,
+
+          message:
+            "The phone returned an invalid location. Please try again."
+
+        };
+
+      }
+
+
+      const latitude =
+        Number(
+          position.coords.latitude
+        );
+
+      const longitude =
+        Number(
+          position.coords.longitude
+        );
+
+      const accuracy =
+        Number(
+          position.coords.accuracy
+        );
+
+
+      if (
+        !Number.isFinite(latitude) ||
+        !Number.isFinite(longitude)
+      ) {
+
+        return {
+
+          success: false,
+
+          message:
+            "The phone could not provide valid GPS coordinates. Please try again."
+
+        };
+
+      }
+
+
+      /*
+       * Prevent obviously bad GPS results.
+       */
+
+      if (
+        latitude < -90 ||
+        latitude > 90 ||
+        longitude < -180 ||
+        longitude > 180
+      ) {
+
+        return {
+
+          success: false,
+
+          message:
+            "The location returned by the phone is invalid. Please try again."
+
+        };
+
+      }
+
+
+      return {
+
+        success: true,
+
+        latitude: latitude,
+
+        longitude: longitude,
+
+        accuracy:
+          Number.isFinite(accuracy)
+            ? accuracy
+            : 9999
+
+      };
+
+    }
+
+
+    /************************************************
      * REGISTER
      ************************************************/
 
     async function registerMember() {
+
+      clearMessage(
+        "registrationMessage"
+      );
+
 
       const name =
         document.getElementById(
@@ -1006,12 +1495,11 @@
       }
 
 
-      registerButton.disabled =
-        true;
+      registerButton.disabled = true;
 
 
-      showLoading(
-        "Checking your location..."
+      hideLocationStatus(
+        "locationStatusRegistration"
       );
 
 
@@ -1021,15 +1509,21 @@
           await getLocation();
 
 
+        hideLoading();
+
+
         if (!gps.success) {
-
-          hideLoading();
-
 
           showMessage(
             "registrationMessage",
             gps.message,
             false
+          );
+
+
+          showLocationStatus(
+            "locationStatusRegistration",
+            "📍 Please turn ON your phone's Location/GPS and allow location access for this website, then press REGISTER & CHECK IN again."
           );
 
 
@@ -1040,6 +1534,14 @@
           return;
 
         }
+
+
+        showLocationStatus(
+          "locationStatusRegistration",
+          "📍 Location found. Accuracy: approximately " +
+          Math.round(gps.accuracy) +
+          " metres."
+        );
 
 
         showLoading(
@@ -1054,14 +1556,11 @@
 
             {
 
-              name:
-                name,
+              name: name,
 
-              mobile:
-                mobile,
+              mobile: mobile,
 
-              location:
-                location,
+              location: location,
 
               latitude:
                 gps.latitude,
@@ -1091,9 +1590,7 @@
 
             result &&
             result.message
-
               ? result.message
-
               : "Registration failed. Please try again.",
 
             false
@@ -1154,12 +1651,18 @@
         hideLoading();
 
 
+        console.error(
+          "Registration error:",
+          error
+        );
+
+
         showMessage(
 
           "registrationMessage",
 
           error.message ||
-            "Unable to connect to the server.",
+            "Unable to connect to the attendance server. Please try again.",
 
           false
 
@@ -1195,12 +1698,17 @@
       }
 
 
+      clearMessage(
+        "checkInMessage"
+      );
+
+
       checkInButton.disabled =
         true;
 
 
-      showLoading(
-        "Checking your location..."
+      hideLocationStatus(
+        "locationStatusMember"
       );
 
 
@@ -1210,10 +1718,10 @@
           await getLocation();
 
 
+        hideLoading();
+
+
         if (!gps.success) {
-
-          hideLoading();
-
 
           showMessage(
 
@@ -1226,6 +1734,12 @@
           );
 
 
+          showLocationStatus(
+            "locationStatusMember",
+            "📍 Turn ON Location/GPS and allow this website to access your location, then press CHECK IN again."
+          );
+
+
           checkInButton.disabled =
             false;
 
@@ -1233,6 +1747,14 @@
           return;
 
         }
+
+
+        showLocationStatus(
+          "locationStatusMember",
+          "📍 Location found. Accuracy: approximately " +
+          Math.round(gps.accuracy) +
+          " metres."
+        );
 
 
         showLoading(
@@ -1320,12 +1842,18 @@
         hideLoading();
 
 
+        console.error(
+          "Check-in error:",
+          error
+        );
+
+
         showMessage(
 
           "checkInMessage",
 
           error.message ||
-            "Unable to connect to the server.",
+            "Unable to connect to the server. Please try again.",
 
           false
 
@@ -1496,16 +2024,24 @@
       ).value = "";
 
 
-      document.getElementById(
+      clearMessage(
         "registrationMessage"
-      ).className =
-        "message";
+      );
 
 
-      document.getElementById(
+      clearMessage(
         "checkInMessage"
-      ).className =
-        "message";
+      );
+
+
+      hideLocationStatus(
+        "locationStatusRegistration"
+      );
+
+
+      hideLocationStatus(
+        "locationStatusMember"
+      );
 
     }
 
@@ -1609,5 +2145,4 @@
   </script>
 
 </body>
-
 </html>

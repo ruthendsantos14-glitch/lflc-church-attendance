@@ -9,10 +9,7 @@
     content="width=device-width, initial-scale=1.0, viewport-fit=cover"
   >
 
-  <meta
-    name="theme-color"
-    content="#ffffff"
-  >
+  <meta name="theme-color" content="#ffffff">
 
   <meta
     name="description"
@@ -24,6 +21,7 @@
   <title>LFNC Church Check-In</title>
 
   <style>
+
     * {
       box-sizing: border-box;
     }
@@ -48,7 +46,7 @@
       width: 100%;
       max-width: 520px;
       min-height: 100vh;
-      background: #ffffff;
+      background: #fff;
       padding: 24px 18px 40px;
     }
 
@@ -84,7 +82,7 @@
     }
 
     .card {
-      background: #ffffff;
+      background: #fff;
       border: 1px solid #e1e5eb;
       border-radius: 16px;
       padding: 20px;
@@ -111,11 +109,7 @@
       border-radius: 10px;
       font-size: 16px;
       outline: none;
-      background: #ffffff;
-    }
-
-    input:focus {
-      border-color: #555;
+      background: #fff;
     }
 
     button {
@@ -127,8 +121,8 @@
       font-weight: bold;
       cursor: pointer;
       margin-top: 18px;
-      background: #111111;
-      color: #ffffff;
+      background: #111;
+      color: #fff;
       -webkit-tap-highlight-color: transparent;
     }
 
@@ -139,7 +133,7 @@
 
     .secondary {
       background: #eeeeee;
-      color: #222222;
+      color: #222;
     }
 
     .message {
@@ -181,7 +175,7 @@
 
     .footer {
       text-align: center;
-      color: #777777;
+      color: #777;
       font-size: 12px;
       margin-top: 28px;
       line-height: 1.5;
@@ -212,8 +206,8 @@
     .spinner {
       width: 42px;
       height: 42px;
-      border: 4px solid #dddddd;
-      border-top-color: #111111;
+      border: 4px solid #ddd;
+      border-top-color: #111;
       border-radius: 50%;
       margin: 0 auto 16px;
       animation: spin 0.8s linear infinite;
@@ -225,23 +219,10 @@
       }
     }
 
-    /*
-     * Important:
-     * These iframes are hidden visually but are NOT display:none.
-     * This improves reliability with Android Chrome POST requests.
-     */
-    .api-frame {
-      position: fixed;
-      width: 1px;
-      height: 1px;
-      border: 0;
-      opacity: 0;
-      pointer-events: none;
-      left: -10px;
-      top: -10px;
-    }
   </style>
+
 </head>
+
 
 <body>
 
@@ -285,6 +266,7 @@
         Register & Check In
       </h2>
 
+
       <label for="name">
         Name
       </label>
@@ -295,6 +277,7 @@
         placeholder="Enter your name"
         autocomplete="name"
       >
+
 
       <label for="mobile">
         Mobile Number
@@ -307,6 +290,7 @@
         autocomplete="tel"
       >
 
+
       <label for="location">
         Location
       </label>
@@ -318,12 +302,14 @@
         autocomplete="address-level2"
       >
 
+
       <button
         id="registerButton"
         type="button"
       >
         REGISTER & CHECK IN
       </button>
+
 
       <div
         id="registrationMessage"
@@ -344,10 +330,12 @@
         Welcome
       </h2>
 
+
       <div
         class="member-info"
         id="memberInfo"
       ></div>
+
 
       <button
         id="checkInButton"
@@ -356,6 +344,7 @@
         CHECK IN
       </button>
 
+
       <button
         id="forgetButton"
         class="secondary"
@@ -363,6 +352,7 @@
       >
         THIS IS NOT ME
       </button>
+
 
       <div
         id="checkInMessage"
@@ -433,151 +423,54 @@
 
 
     /************************************************
-     * BUTTON EVENTS
+     * BUTTONS
      ************************************************/
 
     registerButton.addEventListener(
       "click",
-      function () {
-        registerMember();
-      }
+      registerMember
     );
 
     checkInButton.addEventListener(
       "click",
-      function () {
-        checkIn();
-      }
+      checkIn
     );
 
     forgetButton.addEventListener(
       "click",
-      function () {
-        forgetMember();
-      }
+      forgetMember
     );
 
 
     /************************************************
-     * API POST
+     * JSONP API
      *
-     * Every request gets its own iframe.
+     * This avoids the cross-origin POST response
+     * problem between GitHub Pages and Apps Script.
      ************************************************/
 
-    function apiPost(action, data) {
+    function apiRequest(
+      action,
+      data
+    ) {
 
       return new Promise(
-        function (resolve, reject) {
+        function(resolve, reject) {
 
-          const frameName =
-            "apiFrame_" +
+          const callbackName =
+            "lflcCallback_" +
             Date.now() +
             "_" +
-            Math.floor(Math.random() * 100000);
-
-          const iframe =
-            document.createElement("iframe");
-
-          iframe.name =
-            frameName;
-
-          iframe.className =
-            "api-frame";
-
-          document.body.appendChild(
-            iframe
-          );
+            Math.floor(
+              Math.random() * 100000
+            );
 
 
-          const form =
-            document.createElement("form");
-
-          form.method =
-            "POST";
-
-          form.action =
-            APPS_SCRIPT_URL;
-
-          form.target =
-            frameName;
-
-          form.style.display =
-            "none";
+          const script =
+            document.createElement("script");
 
 
-          /*
-           * IMPORTANT:
-           * The Apps Script backend expects
-           * action, name, mobile, location,
-           * latitude, longitude, accuracy and
-           * memberId directly in the payload.
-           */
-
-          const requestPayload = {
-
-            action:
-              action,
-
-            name:
-              data && data.name
-                ? data.name
-                : undefined,
-
-            mobile:
-              data && data.mobile
-                ? data.mobile
-                : undefined,
-
-            location:
-              data && data.location
-                ? data.location
-                : undefined,
-
-            latitude:
-              data && data.latitude !== undefined
-                ? data.latitude
-                : undefined,
-
-            longitude:
-              data && data.longitude !== undefined
-                ? data.longitude
-                : undefined,
-
-            accuracy:
-              data && data.accuracy !== undefined
-                ? data.accuracy
-                : undefined,
-
-            memberId:
-              data && data.memberId
-                ? data.memberId
-                : undefined
-
-          };
-
-
-          const payload =
-            document.createElement("input");
-
-          payload.type =
-            "hidden";
-
-          payload.name =
-            "payload";
-
-          payload.value =
-            JSON.stringify(requestPayload);
-
-          form.appendChild(
-            payload
-          );
-
-          document.body.appendChild(
-            form
-          );
-
-
-          let completed =
+          let finished =
             false;
 
 
@@ -585,33 +478,24 @@
 
             try {
 
-              if (
-                form &&
-                form.parentNode
-              ) {
-
-                form.parentNode.removeChild(
-                  form
-                );
-
-              }
-
-              if (
-                iframe &&
-                iframe.parentNode
-              ) {
-
-                iframe.parentNode.removeChild(
-                  iframe
-                );
-
-              }
+              delete window[
+                callbackName
+              ];
 
             } catch (error) {
 
-              console.log(
-                "Cleanup error:",
-                error
+              console.log(error);
+
+            }
+
+
+            if (
+              script &&
+              script.parentNode
+            ) {
+
+              script.parentNode.removeChild(
+                script
               );
 
             }
@@ -619,13 +503,19 @@
           }
 
 
-          function success(result) {
+          function finishSuccess(
+            result
+          ) {
 
-            if (completed) {
+            if (finished) {
               return;
             }
 
-            completed = true;
+            finished = true;
+
+            clearTimeout(
+              timeout
+            );
 
             cleanup();
 
@@ -634,13 +524,19 @@
           }
 
 
-          function failure(message) {
+          function finishError(
+            message
+          ) {
 
-            if (completed) {
+            if (finished) {
               return;
             }
 
-            completed = true;
+            finished = true;
+
+            clearTimeout(
+              timeout
+            );
 
             cleanup();
 
@@ -651,80 +547,167 @@
           }
 
 
-          function messageHandler(event) {
+          window[
+            callbackName
+          ] =
+            function(result) {
 
-            if (
-              !event.data ||
-              event.data.type !==
-                "LFNC_ATTENDANCE_RESULT"
-            ) {
-
-              return;
-
-            }
-
-
-            window.removeEventListener(
-              "message",
-              messageHandler
-            );
-
-
-            success(
-              event.data.result
-            );
-
-          }
-
-
-          window.addEventListener(
-            "message",
-            messageHandler
-          );
-
-
-          /*
-           * Safety timeout.
-           */
-
-          setTimeout(
-            function () {
-
-              window.removeEventListener(
-                "message",
-                messageHandler
+              finishSuccess(
+                result
               );
 
+            };
 
-              if (!completed) {
 
-                failure(
-                  "The server did not respond. Please check your internet connection and try again."
-                );
+          const params =
+            new URLSearchParams();
 
-              }
 
-            },
-            30000
+          params.set(
+            "callback",
+            callbackName
           );
 
 
-          try {
+          params.set(
+            "action",
+            action
+          );
 
-            form.submit();
 
-          } catch (error) {
+          if (
+            data &&
+            data.name !== undefined
+          ) {
 
-            window.removeEventListener(
-              "message",
-              messageHandler
-            );
-
-            failure(
-              error.message
+            params.set(
+              "name",
+              data.name
             );
 
           }
+
+
+          if (
+            data &&
+            data.mobile !== undefined
+          ) {
+
+            params.set(
+              "mobile",
+              data.mobile
+            );
+
+          }
+
+
+          if (
+            data &&
+            data.location !== undefined
+          ) {
+
+            params.set(
+              "location",
+              data.location
+            );
+
+          }
+
+
+          if (
+            data &&
+            data.latitude !== undefined
+          ) {
+
+            params.set(
+              "latitude",
+              String(
+                data.latitude
+              )
+            );
+
+          }
+
+
+          if (
+            data &&
+            data.longitude !== undefined
+          ) {
+
+            params.set(
+              "longitude",
+              String(
+                data.longitude
+              )
+            );
+
+          }
+
+
+          if (
+            data &&
+            data.accuracy !== undefined
+          ) {
+
+            params.set(
+              "accuracy",
+              String(
+                data.accuracy
+              )
+            );
+
+          }
+
+
+          if (
+            data &&
+            data.memberId !== undefined
+          ) {
+
+            params.set(
+              "memberId",
+              data.memberId
+            );
+
+          }
+
+
+          script.src =
+            APPS_SCRIPT_URL +
+            "?" +
+            params.toString();
+
+
+          script.async =
+            true;
+
+
+          script.onerror =
+            function() {
+
+              finishError(
+                "Unable to connect to the attendance server."
+              );
+
+            };
+
+
+          document.body.appendChild(
+            script
+          );
+
+
+          const timeout =
+            setTimeout(
+              function() {
+
+                finishError(
+                  "The server did not respond. Please try again."
+                );
+
+              },
+              30000
+            );
 
         }
       );
@@ -736,16 +719,21 @@
      * LOADING
      ************************************************/
 
-    function showLoading(message) {
+    function showLoading(
+      message
+    ) {
 
       document.getElementById(
         "loadingText"
       ).textContent =
         message;
 
+
       document.getElementById(
         "loadingOverlay"
-      ).classList.add("show");
+      ).classList.add(
+        "show"
+      );
 
     }
 
@@ -754,13 +742,15 @@
 
       document.getElementById(
         "loadingOverlay"
-      ).classList.remove("show");
+      ).classList.remove(
+        "show"
+      );
 
     }
 
 
     /************************************************
-     * MESSAGES
+     * MESSAGE
      ************************************************/
 
     function showMessage(
@@ -774,8 +764,10 @@
           elementId
         );
 
+
       element.textContent =
         message || "";
+
 
       element.className =
         "message show " +
@@ -795,9 +787,11 @@
     function getLocation() {
 
       return new Promise(
-        function (resolve) {
+        function(resolve) {
 
-          if (!navigator.geolocation) {
+          if (
+            !navigator.geolocation
+          ) {
 
             resolve({
 
@@ -817,7 +811,9 @@
             false;
 
 
-          function finish(result) {
+          function finish(
+            result
+          ) {
 
             if (finished) {
               return;
@@ -832,7 +828,7 @@
 
           const safetyTimer =
             setTimeout(
-              function () {
+              function() {
 
                 finish({
 
@@ -850,7 +846,7 @@
 
           navigator.geolocation.getCurrentPosition(
 
-            function (position) {
+            function(position) {
 
               clearTimeout(
                 safetyTimer
@@ -875,7 +871,7 @@
             },
 
 
-            function (error) {
+            function(error) {
 
               clearTimeout(
                 safetyTimer
@@ -886,21 +882,27 @@
                 "Unable to get your location.";
 
 
-              if (error.code === 1) {
+              if (
+                error.code === 1
+              ) {
 
                 message =
                   "Location permission was denied. Please allow location access and try again.";
 
               }
 
-              else if (error.code === 2) {
+              else if (
+                error.code === 2
+              ) {
 
                 message =
                   "Your location could not be determined. Please try again.";
 
               }
 
-              else if (error.code === 3) {
+              else if (
+                error.code === 3
+              ) {
 
                 message =
                   "Location request timed out. Please try again.";
@@ -942,7 +944,7 @@
 
 
     /************************************************
-     * REGISTER MEMBER
+     * REGISTER
      ************************************************/
 
     async function registerMember() {
@@ -1023,14 +1025,17 @@
 
           hideLoading();
 
+
           showMessage(
             "registrationMessage",
             gps.message,
             false
           );
 
+
           registerButton.disabled =
             false;
+
 
           return;
 
@@ -1043,7 +1048,7 @@
 
 
         const result =
-          await apiPost(
+          await apiRequest(
 
             "registerAndCheckIn",
 
@@ -1141,8 +1146,10 @@
         registerButton.disabled =
           false;
 
+      }
 
-      } catch (error) {
+
+      catch(error) {
 
         hideLoading();
 
@@ -1207,6 +1214,7 @@
 
           hideLoading();
 
+
           showMessage(
 
             "checkInMessage",
@@ -1233,7 +1241,7 @@
 
 
         const result =
-          await apiPost(
+          await apiRequest(
 
             "checkInMember",
 
@@ -1304,8 +1312,10 @@
         checkInButton.disabled =
           false;
 
+      }
 
-      } catch (error) {
+
+      catch(error) {
 
         hideLoading();
 
@@ -1334,7 +1344,9 @@
      * SHOW MEMBER
      ************************************************/
 
-    function showMember(member) {
+    function showMember(
+      member
+    ) {
 
       registrationCard.style.display =
         "none";
@@ -1349,9 +1361,11 @@
       ).innerHTML =
 
         "<strong>" +
+
         escapeHtml(
           member.name || ""
         ) +
+
         "</strong><br>" +
 
         "Member ID: " +
@@ -1401,7 +1415,7 @@
       try {
 
         const member =
-          await apiPost(
+          await apiRequest(
 
             "getMember",
 
@@ -1424,7 +1438,9 @@
             member
           );
 
-        } else {
+        }
+
+        else {
 
           localStorage.removeItem(
             MEMBER_KEY
@@ -1432,13 +1448,9 @@
 
         }
 
-      } catch (error) {
+      }
 
-        /*
-         * Do not delete the saved member
-         * just because the server is temporarily
-         * unavailable.
-         */
+      catch(error) {
 
         console.log(
           "Could not load saved member:",
@@ -1502,7 +1514,9 @@
      * HTML ESCAPE
      ************************************************/
 
-    function escapeHtml(text) {
+    function escapeHtml(
+      text
+    ) {
 
       return String(text)
 
@@ -1538,11 +1552,13 @@
      * SERVICE WORKER
      ************************************************/
 
-    if ("serviceWorker" in navigator) {
+    if (
+      "serviceWorker" in navigator
+    ) {
 
       window.addEventListener(
         "load",
-        function () {
+        function() {
 
           navigator.serviceWorker
 
@@ -1551,7 +1567,7 @@
             )
 
             .then(
-              function () {
+              function() {
 
                 console.log(
                   "LFNC service worker registered."
@@ -1561,7 +1577,7 @@
             )
 
             .catch(
-              function (error) {
+              function(error) {
 
                 console.log(
                   "Service worker registration failed:",
@@ -1583,7 +1599,7 @@
 
     window.addEventListener(
       "load",
-      function () {
+      function() {
 
         loadSavedMember();
 
